@@ -10,22 +10,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --black:#0A0A0B;
-    --black-soft:#141417;
-    --card:#1C1C20;
-    --card-2:#222226;
-    --line: rgba(255,255,255,0.08);
+    --black:#FFFFFF;
+    --black-soft:#F6F5F2;
+    --card:#FFFFFF;
+    --card-2:#FBF7F2;
+    --line: rgba(18,17,15,0.10);
     --orange:#FF6A00;
-    --orange-light:#FF9142;
-    --orange-dim: rgba(255,106,0,0.14);
-    --white:#F8F7F4;
-    --white-dim: rgba(248,247,244,0.62);
-    --gray:#9A9AA0;
-    --green:#2ECC71;
+    --orange-light:#E85D00;
+    --orange-dim: rgba(255,106,0,0.10);
+    --white:#121110;
+    --white-dim: rgba(18,17,15,0.62);
+    --gray:#7A7873;
+    --green:#1FA057;
     --radius: 14px;
     --display: 'Space Grotesk', sans-serif;
     --body: 'Inter', sans-serif;
     --mono: 'JetBrains Mono', monospace;
+    --shadow: 0 24px 60px -24px rgba(18,17,15,0.16);
   }
 
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -75,7 +76,7 @@
   /* ---------- NAV ---------- */
   header{
     position:fixed; top:0; left:0; right:0; z-index:200;
-    background:rgba(10,10,11,0.72);
+    background:rgba(255,255,255,0.78);
     backdrop-filter:blur(14px);
     -webkit-backdrop-filter:blur(14px);
     border-bottom:1px solid var(--line);
@@ -127,7 +128,7 @@
   .btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 24px -8px rgba(255,106,0,0.6);}
   .btn-ghost{
     border-color:var(--line); color:var(--white);
-    background:rgba(255,255,255,0.03);
+    background:rgba(18,17,15,0.02);
   }
   .btn-ghost:hover{border-color:var(--orange); color:var(--orange-light);}
   .nav-toggle{display:none; flex-direction:column; gap:5px; background:none; border:none; padding:6px;}
@@ -147,8 +148,8 @@
     content:'';
     position:absolute; inset:0;
     background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      linear-gradient(rgba(18,17,15,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(18,17,15,0.045) 1px, transparent 1px);
     background-size:44px 44px;
     mask-image:radial-gradient(ellipse 700px 500px at 20% 0%, black, transparent 70%);
     pointer-events:none;
@@ -188,7 +189,7 @@
     overflow:hidden;
     border:1px solid var(--line);
     background:var(--black-soft);
-    box-shadow:0 40px 80px -30px rgba(0,0,0,0.7);
+    box-shadow:0 40px 80px -30px rgba(18,17,15,0.22);
   }
   .device-frame img{
     width:100%; height:100%; object-fit:cover;
@@ -223,7 +224,7 @@
     border-radius:12px;
     padding:12px 16px;
     display:flex; align-items:center; gap:10px;
-    box-shadow:0 16px 40px -14px rgba(0,0,0,0.6);
+    box-shadow:0 16px 40px -14px rgba(18,17,15,0.18);
     z-index:8;
     animation:float 4.5s ease-in-out infinite;
   }
@@ -272,6 +273,47 @@
   .section-head.center{margin-left:auto; margin-right:auto; text-align:center;}
 
   /* ---------- WHY #1 IN COMPUTER VILLAGE ---------- */
+  /* ---------- GALLERY ---------- */
+  .gallery-section{background:var(--black);}
+  .gallery-tabs{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:36px;}
+  .gallery-tab{
+    font-family:var(--mono); font-size:12px; letter-spacing:0.04em;
+    padding:10px 18px; border-radius:999px; border:1px solid var(--line);
+    background:var(--card); color:var(--white-dim);
+    transition:all .2s ease;
+  }
+  .gallery-tab:hover{border-color:var(--orange); color:var(--orange-light);}
+  .gallery-tab.active{background:var(--orange); border-color:var(--orange); color:#160900;}
+  .gallery-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:20px;
+  }
+  .gallery-item{
+    border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--card);
+    overflow:hidden;
+    transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  }
+  .gallery-item:hover{transform:translateY(-6px); box-shadow:var(--shadow); border-color:rgba(255,106,0,0.35);}
+  .gallery-thumb{
+    aspect-ratio:1/1;
+    background:var(--black-soft);
+    display:flex; align-items:center; justify-content:center;
+    padding:22px;
+    position:relative;
+  }
+  .gallery-thumb img{width:100%; height:100%; object-fit:contain;}
+  .gallery-cat{
+    position:absolute; top:10px; left:10px;
+    font-family:var(--mono); font-size:9.5px; letter-spacing:0.06em; text-transform:uppercase;
+    background:var(--orange-dim); color:var(--orange-light);
+    padding:4px 9px; border-radius:999px;
+  }
+  .gallery-info{padding:14px 16px 18px; border-top:1px solid var(--line);}
+  .gallery-info b{display:block; font-size:13.5px; margin-bottom:2px;}
+  .gallery-info span{display:block; font-family:var(--mono); font-size:10.5px; color:var(--gray);}
+  @media (max-width:980px){ .gallery-grid{grid-template-columns:repeat(3,1fr);} }
+  @media (max-width:620px){ .gallery-grid{grid-template-columns:repeat(2,1fr); gap:14px;} }
+
   .cv-section{background:var(--black);}
   .cv-grid{display:grid; grid-template-columns:0.9fr 1.1fr; gap:60px; align-items:start;}
   .cv-list{display:flex; flex-direction:column; gap:0;}
@@ -296,7 +338,7 @@
     content:'COMPUTER VILLAGE';
     position:absolute; right:-10px; bottom:-24px;
     font-family:var(--display); font-weight:700;
-    font-size:78px; color:rgba(255,255,255,0.03);
+    font-size:78px; color:rgba(18,17,15,0.045);
     letter-spacing:-0.02em; white-space:nowrap; pointer-events:none;
   }
   .cv-panel .rank{
@@ -482,6 +524,7 @@
       <span>SAKATAN<small>BUSINESS VENTURES</small></span>
     </a>
     <ul class="nav-links">
+      <li><a href="#gallery">Gallery</a></li>
       <li><a href="#why-cv">Why Us #1</a></li>
       <li><a href="#standout">Stand Out</a></li>
       <li><a href="#about">About</a></li>
@@ -544,6 +587,75 @@
       <span>iPHONE</span><span>SAMSUNG GALAXY</span><span>MACBOOK</span><span>HP LAPTOPS</span><span>DELL</span><span>EARBUDS & CHARGERS</span><span>SCREEN GUARDS</span><span>POWER BANKS</span>
     </div>
   </div>
+
+  <!-- GALLERY -->
+  <section class="gallery-section" id="gallery">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">In stock right now</span>
+        <h2>Browse our gallery</h2>
+        <p>A look at genuine devices currently moving through our shop — phones, laptops and the accessories to go with them.</p>
+      </div>
+
+      <div class="gallery-tabs reveal">
+        <button class="gallery-tab active" data-filter="all">All</button>
+        <button class="gallery-tab" data-filter="phones">Phones</button>
+        <button class="gallery-tab" data-filter="laptops">Laptops</button>
+        <button class="gallery-tab" data-filter="accessories">Accessories</button>
+      </div>
+
+      <div class="gallery-grid reveal" id="galleryGrid">
+        <div class="gallery-item" data-cat="phones">
+          <div class="gallery-thumb"><span class="gallery-cat">Phones</span><img src="samsung-ultra-black.png" alt="Samsung Galaxy Ultra, black"></div>
+          <div class="gallery-info"><b>Samsung Galaxy Ultra</b><span>128GB / 256GB · Black</span></div>
+        </div>
+        <div class="gallery-item" data-cat="phones">
+          <div class="gallery-thumb"><span class="gallery-cat">Phones</span><img src="iphone-titanium.png" alt="iPhone in titanium finish"></div>
+          <div class="gallery-info"><b>iPhone Pro</b><span>Titanium finish</span></div>
+        </div>
+        <div class="gallery-item" data-cat="phones">
+          <div class="gallery-thumb"><span class="gallery-cat">Phones</span><img src="iphone17pro-orange.png" alt="iPhone 17 Pro in orange"></div>
+          <div class="gallery-info"><b>iPhone 17 Pro</b><span>Orange finish · New arrival</span></div>
+        </div>
+        <div class="gallery-item" data-cat="phones">
+          <div class="gallery-thumb"><span class="gallery-cat">Phones</span><img src="iphone-clearcase.png" alt="iPhone in a clear protective case"></div>
+          <div class="gallery-info"><b>iPhone Pro</b><span>Comes with clear case</span></div>
+        </div>
+        <div class="gallery-item" data-cat="phones">
+          <div class="gallery-thumb"><span class="gallery-cat">Phones</span><img src="galaxy-s25ultra.png" alt="Samsung Galaxy S25 Ultra"></div>
+          <div class="gallery-info"><b>Samsung S25 Ultra</b><span>Titanium grey</span></div>
+        </div>
+        <div class="gallery-item" data-cat="accessories">
+          <div class="gallery-thumb"><span class="gallery-cat">Bundle</span><img src="iphone-bundle.png" alt="iPhone lineup with Apple Watch and AirPods accessories"></div>
+          <div class="gallery-info"><b>iPhone + Watch + AirPods</b><span>Full accessory bundle</span></div>
+        </div>
+        <div class="gallery-item" data-cat="laptops">
+          <div class="gallery-thumb"><span class="gallery-cat">Laptops</span><img src="macbook-silver.png" alt="Silver MacBook, back view"></div>
+          <div class="gallery-info"><b>MacBook</b><span>Silver</span></div>
+        </div>
+        <div class="gallery-item" data-cat="laptops">
+          <div class="gallery-thumb"><span class="gallery-cat">Laptops</span><img src="windows-laptop.png" alt="Windows 11 laptop"></div>
+          <div class="gallery-info"><b>Windows 11 Laptop</b><span>Everyday productivity</span></div>
+        </div>
+        <div class="gallery-item" data-cat="laptops">
+          <div class="gallery-thumb"><span class="gallery-cat">Laptops</span><img src="rog-gaming-laptop.png" alt="ASUS ROG gaming laptop with RGB keyboard"></div>
+          <div class="gallery-info"><b>ROG Gaming Laptop</b><span>RGB keyboard · High performance</span></div>
+        </div>
+        <div class="gallery-item" data-cat="accessories">
+          <div class="gallery-thumb"><span class="gallery-cat">Tablets</span><img src="ipad-pro-duo.png" alt="iPad Pro in black and silver"></div>
+          <div class="gallery-info"><b>iPad Pro</b><span>Black or Silver</span></div>
+        </div>
+        <div class="gallery-item" data-cat="accessories">
+          <div class="gallery-thumb"><span class="gallery-cat">Tablets</span><img src="ipad-mini-bundle.png" alt="iPad mini with AirPods and Apple Watch bands"></div>
+          <div class="gallery-info"><b>iPad mini + Accessories</b><span>Bundle with AirPods &amp; bands</span></div>
+        </div>
+        <div class="gallery-item" data-cat="accessories">
+          <div class="gallery-thumb"><span class="gallery-cat">Accessories</span><img src="jbl-headphones.png" alt="JBL wireless over-ear headphones"></div>
+          <div class="gallery-info"><b>JBL Wireless Headphones</b><span>Over-ear · Bluetooth</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- WHY #1 IN COMPUTER VILLAGE -->
   <section class="cv-section" id="why-cv">
@@ -794,7 +906,21 @@
   navToggle.addEventListener('click', () => {
     const open = navLinks.style.display === 'flex';
     navLinks.style.display = open ? 'none' : 'flex';
-    navLinks.style.cssText += open ? '' : 'position:fixed;top:70px;left:0;right:0;background:#0A0A0B;flex-direction:column;padding:24px 28px;border-bottom:1px solid rgba(255,255,255,0.08);gap:18px;';
+    navLinks.style.cssText += open ? '' : 'position:fixed;top:70px;left:0;right:0;background:#FFFFFF;flex-direction:column;padding:24px 28px;border-bottom:1px solid rgba(18,17,15,0.08);gap:18px;box-shadow:0 16px 30px -18px rgba(18,17,15,0.2);';
+  });
+
+  // gallery filter
+  const galleryTabs = document.querySelectorAll('.gallery-tab');
+  const galleryItems = document.querySelectorAll('.gallery-item');
+  galleryTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      galleryTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const filter = tab.dataset.filter;
+      galleryItems.forEach(item => {
+        item.style.display = (filter === 'all' || item.dataset.cat === filter) ? '' : 'none';
+      });
+    });
   });
 
   // scroll reveal
