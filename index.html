@@ -81,16 +81,25 @@
 
   .product-modal-img{
     width:100%;
-    aspect-ratio:4/3;
+    aspect-ratio:1/1;
     overflow:hidden;
-    background:#0d0c0b;
+    background:radial-gradient(circle at 50% 40%, #1c1a17, #0d0c0b 75%);
     border-radius:20px 20px 0 0;
+    box-sizing:border-box;
+    padding:22px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
   .product-modal-img img{
     width:100%;
     height:100%;
-    object-fit:cover;
+    object-fit:contain;
     display:block;
+  }
+
+  @media (max-width:480px){
+    .product-modal-img{ aspect-ratio:4/3; padding:16px; }
   }
 
   .product-modal-body{
@@ -175,6 +184,84 @@
   }
 
   body.modal-open{ overflow:hidden; }
+
+  /* ===== Glass effect (Why #1 section) ===== */
+  .cv-section{ position:relative; overflow:hidden; }
+  .cv-glass-blob{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(70px);
+    z-index:0;
+    pointer-events:none;
+    opacity:0.5;
+    animation:cvBlobFloat 14s ease-in-out infinite;
+  }
+  .cv-blob-1{ width:360px; height:360px; top:-100px; right:-80px;
+    background:radial-gradient(circle at 30% 30%, rgba(255,122,61,0.5), rgba(255,122,61,0) 70%);
+  }
+  .cv-blob-2{ width:300px; height:300px; bottom:-100px; left:-60px;
+    background:radial-gradient(circle at 60% 40%, rgba(46,204,113,0.3), rgba(46,204,113,0) 70%);
+    animation-delay:-6s;
+  }
+  @keyframes cvBlobFloat{
+    0%, 100%{ transform:translate(0,0) scale(1); }
+    50%{ transform:translate(20px,-18px) scale(1.06); }
+  }
+
+  .glass-panel{
+    position:relative;
+    z-index:1;
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:18px;
+    box-shadow:0 8px 28px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.14);
+    transition:transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+  }
+  .glass-panel:hover{
+    transform:translateY(-3px);
+    box-shadow:0 14px 34px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.18);
+  }
+
+  /* Office cards — clearly separated Head Office vs Branch */
+  .office-cards{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin:18px 0 24px;
+  }
+  .office-card{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:14px 16px;
+    border-left:3px solid transparent;
+  }
+  .office-card.head-office{ border-left-color:#FF7A3D; }
+  .office-card.branch-office{ border-left-color:#2ECC71; }
+  .office-badge{
+    flex-shrink:0;
+    font-family:var(--mono, monospace);
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.04em;
+    padding:5px 10px;
+    border-radius:999px;
+    white-space:nowrap;
+    margin-top:2px;
+  }
+  .office-badge-hq{ background:rgba(255,122,61,0.18); color:#FF8A50; border:1px solid rgba(255,122,61,0.35); }
+  .office-badge-branch{ background:rgba(46,204,113,0.16); color:#4CE28C; border:1px solid rgba(46,204,113,0.35); }
+  .office-card-body{ display:flex; flex-direction:column; gap:3px; }
+  .office-card-body b{ font-size:14px; }
+  .office-card-body span{ font-family:var(--mono, monospace); font-size:12px; color:var(--gray); line-height:1.5; }
+
+  /* Animated counting stats, glass chips */
+  .cv-stats{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+  .cv-stats > div{ padding:16px 14px; text-align:center; }
+  .cv-stats b{ display:block; font-size:20px; margin-bottom:4px; }
+  .stat-count{ display:inline-block; }
 </style>
 </head>
 <body>
@@ -436,14 +523,33 @@
           </div>
         </div>
 
-        <div class="cv-panel reveal">
+        <div class="cv-panel reveal glass-panel">
+          <div class="cv-glass-blob cv-blob-1"></div>
+          <div class="cv-glass-blob cv-blob-2"></div>
           <div class="rank"><b>No1</b><span>Trusted Dealer Rating</span></div>
-          <p class="location">Head Office at No 7, Ola Ayeni Street (beside Platinum Plaza), and our branch inside Computer Village at No 22, Olayemi Street (opposite Old Slot), Ikeja — Lagos's central hub for phones, laptops and tech accessories, where customers can compare and verify before they buy.</p>
+
+          <div class="office-cards">
+            <div class="office-card head-office glass-panel">
+              <span class="office-badge office-badge-hq">HEAD OFFICE</span>
+              <div class="office-card-body">
+                <b>Main Office</b>
+                <span>No 7, Ola Ayeni Street, beside Platinum Plaza, Ikeja, Lagos State</span>
+              </div>
+            </div>
+            <div class="office-card branch-office glass-panel">
+              <span class="office-badge office-badge-branch">BRANCH</span>
+              <div class="office-card-body">
+                <b>Computer Village Branch</b>
+                <span>No 22, Olayemi Street, opposite Old Slot, Ikeja, Lagos State</span>
+              </div>
+            </div>
+          </div>
+
           <div class="cv-stats">
-            <div><b>4.9/5</b><span>Customer Rating</span></div>
-            <div><b>20,000+</b><span>Devices Sold Across Nigeria</span></div>
-            <div><b>10+ Years</b><span>Operating in CV</span></div>
-            <div><b>6 Months</b><span>Warranty on Devices</span></div>
+            <div class="glass-panel"><b><span class="stat-count" data-target="4.9" data-decimals="1" data-suffix="/5">0</span></b><span>Customer Rating</span></div>
+            <div class="glass-panel"><b><span class="stat-count" data-target="20000" data-suffix="+">0</span></b><span>Devices Sold Across Nigeria</span></div>
+            <div class="glass-panel"><b><span class="stat-count" data-target="10" data-suffix="+ Years">0</span></b><span>Operating in CV</span></div>
+            <div class="glass-panel"><b><span class="stat-count" data-target="6" data-suffix=" Months">0</span></b><span>Warranty on Devices</span></div>
           </div>
         </div>
       </div>
@@ -836,6 +942,38 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeProductModal();
   });
+
+  // animated counting stats
+  function animateCount(el){
+    const target = parseFloat(el.dataset.target);
+    const decimals = parseInt(el.dataset.decimals || '0', 10);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1600;
+    const start = performance.now();
+
+    function tick(now){
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = target * eased;
+      const formatted = decimals > 0
+        ? current.toFixed(decimals)
+        : Math.round(current).toLocaleString('en-US');
+      el.textContent = formatted + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  const statEls = document.querySelectorAll('.stat-count');
+  const statIo = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateCount(entry.target);
+        statIo.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  statEls.forEach(el => statIo.observe(el));
 
   // scroll reveal
   const revealEls = document.querySelectorAll('.reveal');
