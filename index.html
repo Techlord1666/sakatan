@@ -14,70 +14,167 @@
   .logo-img{height:38px;width:auto;display:block;object-fit:contain;}
   .footer-brand .logo-img{height:44px;}
 
-  /* Flip card for gallery products */
-  .flip-card{ perspective:1200px; cursor:pointer; }
-  .flip-card-inner{
+  /* Clickable gallery thumb */
+  .gallery-thumb{ cursor:pointer; }
+
+  /* ===== Product detail popup (glass effect) ===== */
+  .product-modal-overlay{
+    position:fixed;
+    inset:0;
+    z-index:999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    background:rgba(10,9,8,0.55);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+    box-sizing:border-box;
+    opacity:0;
+    transition:opacity .3s ease;
+  }
+  .product-modal-overlay.open{ display:flex; opacity:1; }
+
+  .product-modal{
     position:relative;
     width:100%;
-    height:100%;
-    transition:transform 0.6s cubic-bezier(.4,.2,.2,1);
-    transform-style:preserve-3d;
-  }
-  .flip-card.flipped .flip-card-inner{ transform:rotateY(180deg); }
-  .flip-card-front, .flip-card-back{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    backface-visibility:hidden;
-    -webkit-backface-visibility:hidden;
-    border-radius:inherit;
-    overflow:hidden;
-  }
-  .flip-card-front{ position:relative; }
-  .flip-card-back{
-    transform:rotateY(180deg);
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:flex-start;
-    gap:10px;
-    padding:18px;
-    background:#12110F;
+    max-width:380px;
+    max-height:88vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(22px) saturate(170%);
+    -webkit-backdrop-filter:blur(22px) saturate(170%);
+    border:1px solid rgba(255,255,255,0.16);
+    border-radius:20px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18);
     color:#fff;
     box-sizing:border-box;
+    transform:translateY(24px) scale(0.96);
+    opacity:0;
+    transition:transform .35s cubic-bezier(.2,.8,.3,1.1), opacity .3s ease;
   }
-  .flip-card-back .back-type{
+  .product-modal-overlay.open .product-modal{
+    transform:translateY(0) scale(1);
+    opacity:1;
+  }
+
+  .product-modal-close{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.18);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    font-size:18px;
+    line-height:1;
+    z-index:2;
+  }
+  .product-modal-close:hover{ background:rgba(255,255,255,0.22); }
+
+  .product-modal-img{
+    width:100%;
+    aspect-ratio:4/3;
+    overflow:hidden;
+    background:#0d0c0b;
+    border-radius:20px 20px 0 0;
+  }
+  .product-modal-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  .product-modal-body{
+    padding:22px 22px 24px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .product-modal-type{
     font-family:var(--mono, monospace);
     font-size:11px;
-    letter-spacing:.06em;
+    letter-spacing:.08em;
     text-transform:uppercase;
-    color:#FF7A3D;
+    color:#FF8A50;
   }
-  .flip-card-back .back-name{
-    font-size:16px;
-    font-weight:600;
-    line-height:1.25;
+  .product-modal-name{
+    font-size:19px;
+    font-weight:700;
+    line-height:1.3;
+    word-wrap:break-word;
   }
-  .flip-card-back .back-storage-label{
-    margin-top:6px;
+  .product-modal-storage-label{
+    margin-top:4px;
     font-family:var(--mono, monospace);
     font-size:10px;
-    letter-spacing:.06em;
+    letter-spacing:.08em;
     text-transform:uppercase;
-    color:rgba(255,255,255,0.55);
+    color:rgba(255,255,255,0.5);
   }
-  .flip-card-back .back-storage{
+  .product-modal-storage-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .product-modal-storage-chips span{
     font-family:var(--mono, monospace);
-    font-size:13px;
+    font-size:12.5px;
+    padding:6px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.10);
+    border:1px solid rgba(255,255,255,0.16);
+    white-space:nowrap;
+  }
+  .product-modal-enquiry{
+    margin-top:8px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    width:100%;
+    padding:14px 18px;
+    border-radius:12px;
+    background:linear-gradient(135deg, #FF7A3D, #FF5A1F);
     color:#fff;
-    line-height:1.5;
+    font-weight:600;
+    font-size:14.5px;
+    text-decoration:none;
+    box-sizing:border-box;
+    box-shadow:0 10px 24px rgba(255,90,31,0.35);
+    transition:transform .2s ease, box-shadow .2s ease;
   }
-  .flip-card-back .back-hint{
-    margin-top:auto;
-    font-size:10px;
-    color:rgba(255,255,255,0.4);
+  .product-modal-enquiry:hover{
+    transform:translateY(-2px);
+    box-shadow:0 14px 30px rgba(255,90,31,0.45);
   }
+  .product-modal-note{
+    font-size:11px;
+    color:rgba(255,255,255,0.45);
+    text-align:center;
+  }
+
+  @media (max-width:480px){
+    .product-modal{
+      max-width:100%;
+      width:100%;
+      max-height:92vh;
+      border-radius:18px;
+    }
+    .product-modal-img{ border-radius:18px 18px 0 0; }
+    .product-modal-body{ padding:18px 18px 20px; }
+    .product-modal-name{ font-size:17px; }
+  }
+
+  body.modal-open{ overflow:hidden; }
 </style>
 </head>
 <body>
@@ -94,7 +191,7 @@
       <li><a href="#standout">Stand Out</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="#reviews">Reviews</a></li>
-      <li><a href="contact.html">Contact</a></li>
+      <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="nav-cta">
       <a href="https://wa.me/2347025510862" class="btn btn-ghost" target="_blank" rel="noopener">WhatsApp</a>
@@ -164,182 +261,123 @@
 
       <div class="gallery-grid reveal" id="galleryGrid">
         <div class="gallery-item" data-cat="phones">
-          <div class="gallery-thumb flip-card">
-            <div class="flip-card-inner">
-              <div class="flip-card-front"><span class="gallery-cat">Phones</span><img src="samsung-ultra-black.png" alt="Samsung Galaxy Ultra, black"></div>
-              <div class="flip-card-back">
-                <span class="back-type">Samsung Phone</span>
-                <span class="back-name">Samsung Galaxy Ultra — Black</span>
-                <span class="back-storage-label">Storage options</span>
-                <span class="back-storage">128GB · 256GB · 512GB</span>
-                <span class="back-hint">Tap to flip back</span>
-              </div>
-            </div>
+          <div class="gallery-thumb"
+               data-type="Samsung Phone"
+               data-name="Samsung Galaxy Ultra — Black"
+               data-storage="128GB,256GB,512GB"
+               data-img="samsung-ultra-black.png">
+            <span class="gallery-cat">Phones</span><img src="samsung-ultra-black.png" alt="Samsung Galaxy Ultra, black">
           </div>
           <div class="gallery-info"><b>Samsung Galaxy Ultra</b><span>128GB / 256GB · Black</span></div>
         </div>
         <div class="gallery-item" data-cat="phones">
-          <div class="gallery-thumb flip-card">
-            <div class="flip-card-inner">
-              <div class="flip-card-front"><span class="gallery-cat">Phones</span><img src="iphone-titanium.png" alt="iPhone in titanium finish"></div>
-              <div class="flip-card-back">
-                <span class="back-type">iPhone</span>
-                <span class="back-name">iPhone Pro — Titanium</span>
-                <span class="back-storage-label">Storage options</span>
-                <span class="back-storage">128GB · 256GB · 512GB · 1TB</span>
-                <span class="back-hint">Tap to flip back</span>
-              </div>
-            </div>
+          <div class="gallery-thumb"
+               data-type="iPhone"
+               data-name="iPhone Pro — Titanium"
+               data-storage="128GB,256GB,512GB,1TB"
+               data-img="iphone-titanium.png">
+            <span class="gallery-cat">Phones</span><img src="iphone-titanium.png" alt="iPhone in titanium finish">
           </div>
           <div class="gallery-info"><b>iPhone Pro</b><span>Titanium finish</span></div>
         </div>
         <div class="gallery-item" data-cat="phones">
-          <div class="gallery-thumb flip-card">
-            <div class="flip-card-inner">
-              <div class="flip-card-front"><span class="gallery-cat">Phones</span><img src="iphone17pro-orange.png" alt="iPhone 17 Pro in orange"></div>
-              <div class="flip-card-back">
-                <span class="back-type">iPhone</span>
-                <span class="back-name">iPhone 17 Pro — Orange</span>
-                <span class="back-storage-label">Storage options</span>
-                <span class="back-storage">256GB · 512GB · 1TB</span>
-                <span class="back-hint">Tap to flip back</span>
-              </div>
-            </div>
+          <div class="gallery-thumb"
+               data-type="iPhone"
+               data-name="iPhone 17 Pro — Orange"
+               data-storage="256GB,512GB,1TB"
+               data-img="iphone17pro-orange.png">
+            <span class="gallery-cat">Phones</span><img src="iphone17pro-orange.png" alt="iPhone 17 Pro in orange">
           </div>
           <div class="gallery-info"><b>iPhone 17 Pro</b><span>Orange finish · New arrival</span></div>
         </div>
         <div class="gallery-item" data-cat="phones">
-          <div class="gallery-thumb flip-card">
-            <div class="flip-card-inner">
-              <div class="flip-card-front"><span class="gallery-cat">Phones</span><img src="iphone-clearcase.png" alt="iPhone in a clear protective case"></div>
-              <div class="flip-card-back">
-                <span class="back-type">iPhone</span>
-                <span class="back-name">iPhone Pro — with Clear Case</span>
-                <span class="back-storage-label">Storage options</span>
-                <span class="back-storage">128GB · 256GB · 512GB</span>
-                <span class="back-hint">Tap to flip back</span>
-              </div>
-            </div>
+          <div class="gallery-thumb"
+               data-type="iPhone"
+               data-name="iPhone Pro — with Clear Case"
+               data-storage="128GB,256GB,512GB"
+               data-img="iphone-clearcase.png">
+            <span class="gallery-cat">Phones</span><img src="iphone-clearcase.png" alt="iPhone in a clear protective case">
           </div>
           <div class="gallery-info"><b>iPhone Pro</b><span>Comes with clear case</span></div>
         </div>
         <div class="gallery-item" data-cat="phones">
-          <div class="gallery-thumb flip-card">
-            <div class="flip-card-inner">
-              <div class="flip-card-front"><span class="gallery-cat">Phones</span><img src="galaxy-s25ultra.png" alt="Samsung Galaxy S25 Ultra"></div>
-              <div class="flip-card-back">
-                <span class="back-type">Samsung Phone</span>
-                <span class="back-name">Samsung S25 Ultra — Titanium Grey</span>
-                <span class="back-storage-label">Storage options</span>
-                <span class="back-storage">256GB · 512GB · 1TB</span>
-                <span class="back-hint">Tap to flip back</span>
-              </div>
-            </div>
+          <div class="gallery-thumb"
+               data-type="Samsung Phone"
+               data-name="Samsung S25 Ultra — Titanium Grey"
+               data-storage="256GB,512GB,1TB"
+               data-img="galaxy-s25ultra.png">
+            <span class="gallery-cat">Phones</span><img src="galaxy-s25ultra.png" alt="Samsung Galaxy S25 Ultra">
           </div>
           <div class="gallery-info"><b>Samsung S25 Ultra</b><span>Titanium grey</span></div>
         </div>
         <div class="gallery-item" data-cat="accessories">
-          <div class="gallery-thumb flip-card">
-            <div class="flip-card-inner">
-              <div class="flip-card-front"><span class="gallery-cat">Bundle</span><img src="iphone-bundle.png" alt="iPhone lineup with Apple Watch and AirPods accessories"></div>
-              <div class="flip-card-back">
-                <span class="back-type">iPhone Bundle</span>
-                <span class="back-name">iPhone + Apple Watch + AirPods</span>
-                <span class="back-storage-label">iPhone storage options</span>
-                <span class="back-storage">128GB · 256GB</span>
-                <span class="back-hint">Tap to flip back</span>
-              </div>
-            </div>
+          <div class="gallery-thumb"
+               data-type="iPhone Bundle"
+               data-name="iPhone + Apple Watch + AirPods"
+               data-storage="128GB,256GB"
+               data-img="iphone-bundle.png">
+            <span class="gallery-cat">Bundle</span><img src="iphone-bundle.png" alt="iPhone lineup with Apple Watch and AirPods accessories">
           </div>
           <div class="gallery-info"><b>iPhone + Watch + AirPods</b><span>Full accessory bundle</span></div>
         </div>
         <div class="gallery-item" data-cat="laptops">
-          <div class="gallery-thumb flip-card">
-            <div class="flip-card-inner">
-              <div class="flip-card-front"><span class="gallery-cat">Laptops</span><img src="macbook-silver.png" alt="Silver MacBook, back view"></div>
-              <div class="flip-card-back">
-                <span class="back-type">Laptop</span>
-                <span class="back-name">MacBook — Silver</span>
-                <span class="back-storage-label">Storage options</span>
-                <span class="back-storage">256GB · 512GB SSD</span>
-                <span class="back-hint">Tap to flip back</span>
-              </div>
-            </div>
+          <div class="gallery-thumb"
+               data-type="Laptop"
+               data-name="MacBook — Silver"
+               data-storage="256GB SSD,512GB SSD"
+               data-img="macbook-silver.png">
+            <span class="gallery-cat">Laptops</span><img src="macbook-silver.png" alt="Silver MacBook, back view">
           </div>
           <div class="gallery-info"><b>MacBook</b><span>Silver</span></div>
         </div>
         <div class="gallery-item" data-cat="laptops">
-          <div class="gallery-thumb flip-card">
-            <div class="flip-card-inner">
-              <div class="flip-card-front"><span class="gallery-cat">Laptops</span><img src="windows-laptop.png" alt="Windows 11 laptop"></div>
-              <div class="flip-card-back">
-                <span class="back-type">Laptop</span>
-                <span class="back-name">Windows 11 Laptop</span>
-                <span class="back-storage-label">Storage options</span>
-                <span class="back-storage">256GB · 512GB SSD</span>
-                <span class="back-hint">Tap to flip back</span>
-              </div>
-            </div>
+          <div class="gallery-thumb"
+               data-type="Laptop"
+               data-name="Windows 11 Laptop"
+               data-storage="256GB SSD,512GB SSD"
+               data-img="windows-laptop.png">
+            <span class="gallery-cat">Laptops</span><img src="windows-laptop.png" alt="Windows 11 laptop">
           </div>
           <div class="gallery-info"><b>Windows 11 Laptop</b><span>Everyday productivity</span></div>
         </div>
         <div class="gallery-item" data-cat="laptops">
-          <div class="gallery-thumb flip-card">
-            <div class="flip-card-inner">
-              <div class="flip-card-front"><span class="gallery-cat">Laptops</span><img src="rog-gaming-laptop.png" alt="ASUS ROG gaming laptop with RGB keyboard"></div>
-              <div class="flip-card-back">
-                <span class="back-type">Gaming Laptop</span>
-                <span class="back-name">ASUS ROG — RGB Keyboard</span>
-                <span class="back-storage-label">Storage options</span>
-                <span class="back-storage">512GB · 1TB SSD</span>
-                <span class="back-hint">Tap to flip back</span>
-              </div>
-            </div>
+          <div class="gallery-thumb"
+               data-type="Gaming Laptop"
+               data-name="ASUS ROG — RGB Keyboard"
+               data-storage="512GB SSD,1TB SSD"
+               data-img="rog-gaming-laptop.png">
+            <span class="gallery-cat">Laptops</span><img src="rog-gaming-laptop.png" alt="ASUS ROG gaming laptop with RGB keyboard">
           </div>
           <div class="gallery-info"><b>ROG Gaming Laptop</b><span>RGB keyboard · High performance</span></div>
         </div>
         <div class="gallery-item" data-cat="accessories">
-          <div class="gallery-thumb flip-card">
-            <div class="flip-card-inner">
-              <div class="flip-card-front"><span class="gallery-cat">Tablets</span><img src="ipad-pro-duo.png" alt="iPad Pro in black and silver"></div>
-              <div class="flip-card-back">
-                <span class="back-type">iPad</span>
-                <span class="back-name">iPad Pro — Black or Silver</span>
-                <span class="back-storage-label">Storage options</span>
-                <span class="back-storage">128GB · 256GB · 512GB</span>
-                <span class="back-hint">Tap to flip back</span>
-              </div>
-            </div>
+          <div class="gallery-thumb"
+               data-type="iPad"
+               data-name="iPad Pro — Black or Silver"
+               data-storage="128GB,256GB,512GB"
+               data-img="ipad-pro-duo.png">
+            <span class="gallery-cat">Tablets</span><img src="ipad-pro-duo.png" alt="iPad Pro in black and silver">
           </div>
           <div class="gallery-info"><b>iPad Pro</b><span>Black or Silver</span></div>
         </div>
         <div class="gallery-item" data-cat="accessories">
-          <div class="gallery-thumb flip-card">
-            <div class="flip-card-inner">
-              <div class="flip-card-front"><span class="gallery-cat">Tablets</span><img src="ipad-mini-bundle.png" alt="iPad mini with AirPods and Apple Watch bands"></div>
-              <div class="flip-card-back">
-                <span class="back-type">iPad Bundle</span>
-                <span class="back-name">iPad mini + AirPods + Watch Bands</span>
-                <span class="back-storage-label">iPad mini storage options</span>
-                <span class="back-storage">64GB · 256GB</span>
-                <span class="back-hint">Tap to flip back</span>
-              </div>
-            </div>
+          <div class="gallery-thumb"
+               data-type="iPad Bundle"
+               data-name="iPad mini + AirPods + Watch Bands"
+               data-storage="64GB,256GB"
+               data-img="ipad-mini-bundle.png">
+            <span class="gallery-cat">Tablets</span><img src="ipad-mini-bundle.png" alt="iPad mini with AirPods and Apple Watch bands">
           </div>
           <div class="gallery-info"><b>iPad mini + Accessories</b><span>Bundle with AirPods &amp; bands</span></div>
         </div>
         <div class="gallery-item" data-cat="accessories">
-          <div class="gallery-thumb flip-card">
-            <div class="flip-card-inner">
-              <div class="flip-card-front"><span class="gallery-cat">Accessories</span><img src="jbl-headphones.png" alt="JBL wireless over-ear headphones"></div>
-              <div class="flip-card-back">
-                <span class="back-type">Accessory</span>
-                <span class="back-name">JBL Wireless Headphones</span>
-                <span class="back-storage-label">Type</span>
-                <span class="back-storage">Over-ear · Bluetooth</span>
-                <span class="back-hint">Tap to flip back</span>
-              </div>
-            </div>
+          <div class="gallery-thumb"
+               data-type="Accessory"
+               data-name="JBL Wireless Headphones"
+               data-storage="Over-ear,Bluetooth"
+               data-storage-label="Type"
+               data-img="jbl-headphones.png">
+            <span class="gallery-cat">Accessories</span><img src="jbl-headphones.png" alt="JBL wireless over-ear headphones">
           </div>
           <div class="gallery-info"><b>JBL Wireless Headphones</b><span>Over-ear · Bluetooth</span></div>
         </div>
@@ -347,6 +385,24 @@
 
       <div class="gallery-cta reveal">
         <a href="https://wa.me/2347025510862?text=Hello%20Sakatan%2C%20I%20saw%20your%20gallery%20and%20I%20want%20to%20get%20one" class="btn btn-primary" target="_blank" rel="noopener">Get Yours Today →</a>
+      </div>
+
+      <!-- PRODUCT DETAIL POPUP -->
+      <div class="product-modal-overlay" id="productModalOverlay">
+        <div class="product-modal" id="productModal" role="dialog" aria-modal="true">
+          <button class="product-modal-close" id="productModalClose" aria-label="Close">&times;</button>
+          <div class="product-modal-img">
+            <img id="productModalImg" src="" alt="">
+          </div>
+          <div class="product-modal-body">
+            <span class="product-modal-type" id="productModalType"></span>
+            <span class="product-modal-name" id="productModalName"></span>
+            <span class="product-modal-storage-label" id="productModalStorageLabel">Storage options</span>
+            <div class="product-modal-storage-chips" id="productModalStorage"></div>
+            <a href="#" target="_blank" rel="noopener" class="product-modal-enquiry" id="productModalEnquiry">Make Enquiry Today →</a>
+            <span class="product-modal-note">Tap outside this card or the × to close</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -728,9 +784,57 @@
     navLinks.style.cssText += open ? '' : 'position:fixed;top:70px;left:0;right:0;background:#FFFFFF;flex-direction:column;padding:24px 28px;border-bottom:1px solid rgba(18,17,15,0.08);gap:18px;box-shadow:0 16px 30px -18px rgba(18,17,15,0.2);';
   });
 
-  // gallery flip cards
-  document.querySelectorAll('.flip-card').forEach(card => {
-    card.addEventListener('click', () => card.classList.toggle('flipped'));
+  // gallery product popup
+  const modalOverlay = document.getElementById('productModalOverlay');
+  const modalImg = document.getElementById('productModalImg');
+  const modalType = document.getElementById('productModalType');
+  const modalName = document.getElementById('productModalName');
+  const modalStorageLabel = document.getElementById('productModalStorageLabel');
+  const modalStorage = document.getElementById('productModalStorage');
+  const modalEnquiry = document.getElementById('productModalEnquiry');
+  const modalClose = document.getElementById('productModalClose');
+
+  function openProductModal(thumb){
+    const type = thumb.dataset.type || '';
+    const name = thumb.dataset.name || '';
+    const storageRaw = thumb.dataset.storage || '';
+    const storageLabel = thumb.dataset.storageLabel || 'Storage options';
+    const img = thumb.dataset.img || '';
+
+    modalImg.src = img;
+    modalImg.alt = name;
+    modalType.textContent = type;
+    modalName.textContent = name;
+    modalStorageLabel.textContent = storageLabel;
+
+    modalStorage.innerHTML = '';
+    storageRaw.split(',').map(s => s.trim()).filter(Boolean).forEach(opt => {
+      const chip = document.createElement('span');
+      chip.textContent = opt;
+      modalStorage.appendChild(chip);
+    });
+
+    const waText = `Hello Sakatan, I want to make an enquiry about: ${name} (${type})${storageRaw ? ' — storage: ' + storageRaw.replace(/,/g, ', ') : ''}`;
+    modalEnquiry.href = `https://wa.me/2347025510862?text=${encodeURIComponent(waText)}`;
+
+    document.body.classList.add('modal-open');
+    modalOverlay.classList.add('open');
+  }
+
+  function closeProductModal(){
+    modalOverlay.classList.remove('open');
+    document.body.classList.remove('modal-open');
+  }
+
+  document.querySelectorAll('.gallery-thumb').forEach(thumb => {
+    thumb.addEventListener('click', () => openProductModal(thumb));
+  });
+  modalClose.addEventListener('click', closeProductModal);
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) closeProductModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeProductModal();
   });
 
   // scroll reveal
