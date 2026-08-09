@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/jpeg" href="logo.jpeg">
+<title>Store | Sakatan Business Ventures — Computer Village, Lagos State</title>
+<meta name="description" content="Browse original iPhones, Samsung phones, laptops and accessories from Sakatan Business Ventures — Computer Village, Ikeja, Lagos State.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .logo-img{height:38px;width:auto;display:block;object-fit:contain;}
+  .footer-brand .logo-img{height:44px;}
+
+  .page-hero{
+    position:relative;
+    padding:150px 0 50px;
+    background:radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,106,0,0.10), transparent 60%);
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+  }
+  .page-hero h1{font-size:clamp(30px,4.6vw,50px); line-height:1.08;}
+  .page-hero p{color:var(--white-dim); font-size:15px; max-width:520px; margin-top:14px; line-height:1.65;}
+
+  .glass-blob{
+    position:absolute; border-radius:50%; filter:blur(70px); z-index:0;
+    pointer-events:none; opacity:0.5; animation:storeBlobFloat 14s ease-in-out infinite;
+  }
+  .store-blob-1{ width:380px; height:380px; top:-110px; right:-90px;
+    background:radial-gradient(circle at 30% 30%, rgba(255,122,61,0.5), rgba(255,122,61,0) 70%); }
+  .store-blob-2{ width:300px; height:300px; bottom:-100px; left:-70px;
+    background:radial-gradient(circle at 60% 40%, rgba(46,204,113,0.3), rgba(46,204,113,0) 70%); animation-delay:-6s; }
+  @keyframes storeBlobFloat{
+    0%,100%{ transform:translate(0,0) scale(1); }
+    50%{ transform:translate(20px,-16px) scale(1.05); }
+  }
+
+  .glass-panel{
+    position:relative; z-index:1;
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:18px;
+    box-shadow:0 8px 28px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.14);
+    transition:transform .3s ease, box-shadow .3s ease;
+  }
+  .glass-panel:hover{ transform:translateY(-3px); box-shadow:0 14px 32px rgba(0,0,0,0.22); }
+
+  /* ===== Search + filter bar ===== */
+  .store-controls{ padding:34px 0 10px; position:relative; z-index:1; }
+  .search-bar{
+    display:flex; align-items:center; gap:10px;
+    padding:12px 16px;
+    margin-bottom:18px;
+  }
+  .search-bar svg{ flex-shrink:0; width:18px; height:18px; stroke:rgba(255,255,255,0.5); }
+  .search-bar input{
+    flex:1; min-width:0; background:none; border:none; outline:none;
+    color:#fff; font-size:14.5px; font-family:inherit;
+  }
+  .search-bar input::placeholder{ color:rgba(255,255,255,0.4); }
+
+  .category-filters{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
+  .category-chip{
+    font-family:var(--mono, monospace); font-size:12px; padding:8px 14px;
+    border-radius:999px; border:1px solid rgba(255,255,255,0.16);
+    background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.7);
+    cursor:pointer; transition:all .2s ease; white-space:nowrap;
+  }
+  .category-chip:hover{ border-color:rgba(255,122,61,0.4); color:#fff; }
+  .category-chip.active{
+    background:linear-gradient(135deg, #FF7A3D, #FF5A1F);
+    border-color:transparent; color:#fff; font-weight:600;
+  }
+
+  .store-count{
+    font-family:var(--mono, monospace); font-size:12px; color:var(--gray);
+    margin:16px 0 4px;
+  }
+
+  /* ===== Product grid ===== */
+  .store-section{ padding:20px 0 40px; position:relative; }
+  .store-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+    gap:18px;
+    margin-top:16px;
+  }
+  .store-card{ padding:0; overflow:hidden; cursor:pointer; }
+  .store-card-img{
+    width:100%; aspect-ratio:1/1; overflow:hidden;
+    background:radial-gradient(circle at 50% 40%, #1c1a17, #0d0c0b 75%);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .store-card-img img{ width:100%; height:100%; object-fit:contain; padding:14px; box-sizing:border-box; display:block; }
+  .store-card-body{ padding:13px 14px 15px; display:flex; flex-direction:column; gap:5px; }
+  .store-card-cat{ font-family:var(--mono, monospace); font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:#FF8A50; }
+  .store-card-name{ font-size:13.5px; font-weight:700; line-height:1.3; }
+  .store-card-price{ font-family:var(--mono, monospace); font-size:12.5px; color:rgba(255,255,255,0.6); }
+
+  .store-empty{
+    grid-column:1/-1; text-align:center; padding:60px 20px;
+    color:var(--gray); font-family:var(--mono, monospace); font-size:13.5px;
+  }
+
+  /* ===== Pagination ===== */
+  .pagination{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:34px;
+  }
+  .page-btn{
+    font-family:var(--mono, monospace); font-size:13px; font-weight:600;
+    padding:11px 22px; border-radius:12px; border:1px solid rgba(255,255,255,0.16);
+    background:rgba(255,255,255,0.06); color:#fff; cursor:pointer;
+    transition:all .2s ease;
+  }
+  .page-btn:hover:not(:disabled){ border-color:rgba(255,122,61,0.5); background:rgba(255,122,61,0.1); }
+  .page-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+  .page-indicator{ font-family:var(--mono, monospace); font-size:12.5px; color:var(--gray); }
+
+  /* ===== Modal overlays (shared) ===== */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:999; display:none; align-items:center; justify-content:center;
+    padding:16px; background:rgba(10,9,8,0.6); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+    box-sizing:border-box; opacity:0; transition:opacity .3s ease;
+  }
+  .modal-overlay.open{ display:flex; opacity:1; }
+  .modal-card{
+    position:relative; width:100%; max-width:420px; max-height:90vh; overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(22px) saturate(170%); -webkit-backdrop-filter:blur(22px) saturate(170%);
+    border:1px solid rgba(255,255,255,0.16); border-radius:20px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18);
+    color:#fff; box-sizing:border-box; padding:26px 22px;
+    transform:translateY(24px) scale(0.96); opacity:0;
+    transition:transform .35s cubic-bezier(.2,.8,.3,1.1), opacity .3s ease;
+  }
+  .modal-overlay.open .modal-card{ transform:translateY(0) scale(1); opacity:1; }
+  .modal-close{
+    position:absolute; top:12px; right:12px; width:32px; height:32px; border-radius:50%;
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.18); color:#fff;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; line-height:1;
+  }
+  .modal-close:hover{ background:rgba(255,255,255,0.22); }
+  .modal-title{ font-size:18px; font-weight:700; margin:4px 0 4px; padding-right:30px; }
+  .modal-subtitle{ font-size:12.5px; color:rgba(255,255,255,0.55); margin-bottom:18px; line-height:1.5; }
+
+  .field-group{ display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+  .field-group label{
+    font-family:var(--mono, monospace); font-size:10.5px; letter-spacing:.05em;
+    text-transform:uppercase; color:rgba(255,255,255,0.55);
+  }
+  .field-group input[type="text"],
+  .field-group input[type="password"],
+  .field-group input[type="number"],
+  .field-group select,
+  .field-group textarea{
+    width:100%; box-sizing:border-box;
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.16);
+    border-radius:10px;
+    padding:12px 14px;
+    color:#fff;
+    font-size:14px;
+    font-family:inherit;
+    outline:none;
+  }
+  .field-group select{ appearance:none; -webkit-appearance:none; }
+  .field-group select option{ background:#1a1815; color:#fff; }
+  .field-group input::placeholder, .field-group textarea::placeholder{ color:rgba(255,255,255,0.35); }
+  .field-group input:focus, .field-group textarea:focus, .field-group select:focus{ border-color:rgba(255,122,61,0.55); }
+  .field-group textarea{ min-height:90px; resize:vertical; }
+
+  .image-drop{
+    position:relative; border:1.5px dashed rgba(255,255,255,0.22); border-radius:12px;
+    padding:16px; text-align:center; cursor:pointer; transition:border-color .2s ease, background .2s ease;
+  }
+  .image-drop:hover{ border-color:rgba(255,122,61,0.5); background:rgba(255,255,255,0.04); }
+  .image-drop input[type="file"]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .image-drop-label{ font-size:12.5px; color:rgba(255,255,255,0.55); }
+  .image-preview{ margin-top:10px; width:100%; max-height:160px; border-radius:10px; overflow:hidden; display:none; }
+  .image-preview img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+  .modal-submit-btn{
+    width:100%; padding:14px 18px; border-radius:12px; border:none; cursor:pointer;
+    background:linear-gradient(135deg, #FF7A3D, #FF5A1F); color:#fff; font-weight:700; font-size:14.5px;
+    box-shadow:0 10px 24px rgba(255,90,31,0.35);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .modal-submit-btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(255,90,31,0.45); }
+  .modal-error{ font-size:12px; color:#FF8A8A; margin-top:-8px; margin-bottom:14px; display:none; }
+
+  /* Product view modal specifics */
+  .product-view-img{
+    width:100%; aspect-ratio:1/1; border-radius:14px; overflow:hidden; margin-bottom:16px;
+    background:radial-gradient(circle at 50% 40%, #1c1a17, #0d0c0b 75%);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .product-view-img img{ width:100%; height:100%; object-fit:contain; padding:14px; box-sizing:border-box; }
+  .product-view-cat{ font-family:var(--mono, monospace); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#FF8A50; }
+  .product-view-name{ font-size:18px; font-weight:700; margin:4px 0 8px; line-height:1.3; }
+  .product-view-price{ font-family:var(--mono, monospace); font-size:14px; color:#fff; margin-bottom:10px; }
+  .product-view-desc{ font-size:13.5px; color:rgba(255,255,255,0.65); line-height:1.6; margin-bottom:18px; }
+  .product-view-enquiry{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;
+    padding:14px 18px; border-radius:12px;
+    background:linear-gradient(135deg, #FF7A3D, #FF5A1F); color:#fff; font-weight:600; font-size:14.5px;
+    text-decoration:none; box-sizing:border-box; box-shadow:0 10px 24px rgba(255,90,31,0.35);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .product-view-enquiry:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(255,90,31,0.45); }
+  .product-view-delete{
+    margin-top:10px; width:100%; text-align:center; font-family:var(--mono, monospace); font-size:11.5px;
+    color:rgba(255,255,255,0.4); background:none; border:1px solid rgba(255,255,255,0.15); border-radius:10px;
+    padding:9px; cursor:pointer; transition:color .2s ease, border-color .2s ease;
+  }
+  .product-view-delete:hover{ color:#FF6B6B; border-color:rgba(255,107,107,0.4); }
+
+  body.modal-open{ overflow:hidden; }
+
+  /* ===== Hidden upload trigger in footer ===== */
+  .footer-hidden-trigger{
+    width:9px; height:9px; border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    border:none; cursor:pointer; padding:0;
+    opacity:0.5;
+    transition:opacity .3s ease, transform .3s ease, background .3s ease;
+  }
+  .footer-hidden-trigger:hover{
+    opacity:1; transform:scale(1.6);
+    background:rgba(255,122,61,0.7);
+  }
+
+  @media (max-width:600px){
+    .store-grid{ grid-template-columns:repeat(2, 1fr); gap:12px; }
+    .store-card-name{ font-size:12.5px; }
+    .store-card-price{ font-size:11.5px; }
+    .modal-card{ padding:20px 16px; }
+    .modal-title{ font-size:16px; }
+    .category-chip{ font-size:11px; padding:7px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a href="index.html#top" class="logo">
+      <img src="logo.jpeg" alt="Sakatan Business Ventures logo" class="logo-img">
+      <span>SAKATAN<small>BUSINESS VENTURES</small></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="store.html">Store</a></li>
+      <li><a href="index.html#why-cv">Why Us</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="https://wa.me/2347025510862" class="btn btn-ghost" target="_blank" rel="noopener">WhatsApp</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <section class="page-hero">
+    <div class="glass-blob store-blob-1"></div>
+    <div class="glass-blob store-blob-2"></div>
+    <div class="wrap" style="position:relative; z-index:1;">
+      <span class="eyebrow">Full store</span>
+      <h1>Browse everything <span style="color:var(--orange);">in stock.</span></h1>
+      <p>Search by name or filter by category to find exactly what you need — phones, laptops, tablets and accessories.</p>
+    </div>
+  </section>
+
+  <section class="store-controls">
+    <div class="wrap">
+      <div class="search-bar glass-panel">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="storeSearchInput" placeholder="Search products by name...">
+      </div>
+      <div class="category-filters" id="categoryFilters"></div>
+      <div class="store-count" id="storeCount"></div>
+    </div>
+  </section>
+
+  <section class="store-section">
+    <div class="wrap">
+      <div class="store-grid" id="storeGrid"></div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html#top" class="logo"><img src="logo.jpeg" alt="Sakatan Business Ventures logo" class="logo-img"><span>SAKATAN<small>BUSINESS VENTURES</small></span></a>
+        <p>Genuine iPhones, Samsung devices, laptops and accessories — 10+ years serving customers from Computer Village, Ikeja, Lagos State.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="store.html">Store</a></li>
+          <li><a href="index.html#standout">What sets us apart</a></li>
+          <li><a href="about.html">About us</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="contact.html">Contact us</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:07025510862">07025510862</a></li>
+          <li><a href="tel:09074613787">09074613787</a></li>
+          <li><a href="https://wa.me/2347025510862" target="_blank" rel="noopener">WhatsApp us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Sakatan Business Ventures. Computer Village, Ikeja, Lagos State.</span>
+      <span style="display:flex; align-items:center; gap:10px;">
+        Original devices only.
+        <button class="footer-hidden-trigger" id="openUploadPasswordBtn" title="Store management" aria-label="Store management"></button>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<a class="wa-float" href="https://wa.me/2347025510862?text=Hello%20Sakatan%2C%20I%20want%20to%20check%20out%20your%20phones" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">
+  <span class="wa-tooltip">Chat with us</span>
+  <svg viewBox="0 0 32 32"><path d="M16.001 3C9.373 3 4 8.373 4 15.001c0 2.65.87 5.1 2.34 7.09L4.6 28.4l6.5-1.7a11.94 11.94 0 004.9 1.06h.001C22.63 27.76 28 22.39 28 15.76 28 9.13 22.63 3 16.001 3zm6.94 17.02c-.29.82-1.7 1.55-2.35 1.65-.6.09-1.36.13-2.19-.14-.5-.16-1.15-.38-1.98-.74-3.48-1.5-5.75-5.01-5.93-5.24-.17-.24-1.42-1.89-1.42-3.6s.9-2.56 1.22-2.91c.32-.35.7-.44.93-.44.23 0 .47 0 .67.01.22.01.5-.08.78.6.29.7.98 2.42 1.07 2.59.09.17.15.37.03.6-.12.24-.18.38-.36.58-.18.2-.38.45-.54.6-.18.17-.37.36-.16.7.21.35.93 1.53 1.99 2.48 1.37 1.22 2.52 1.6 2.87 1.78.35.17.55.15.76-.09.2-.24.87-1.01 1.1-1.36.23-.35.46-.29.77-.17.32.12 2.02.95 2.36 1.12.35.17.58.26.66.4.09.15.09.85-.2 1.67z"/></svg>
+</a>
+
+<!-- PASSWORD MODAL -->
+<div class="modal-overlay" id="passwordModalOverlay">
+  <div class="modal-card" id="passwordModalCard">
+    <button class="modal-close" id="passwordModalClose" aria-label="Close">&times;</button>
+    <div class="modal-title">Store management</div>
+    <div class="modal-subtitle">Enter the access code to upload a new product.</div>
+    <div class="field-group">
+      <label for="accessCodeInput">Access code</label>
+      <input type="password" id="accessCodeInput" placeholder="Enter access code" autocomplete="off">
+    </div>
+    <div class="modal-error" id="passwordError">Incorrect access code. Try again.</div>
+    <button class="modal-submit-btn" id="submitPasswordBtn">Unlock →</button>
+  </div>
+</div>
+
+<!-- UPLOAD PRODUCT MODAL -->
+<div class="modal-overlay" id="uploadModalOverlay">
+  <div class="modal-card" id="uploadModalCard">
+    <button class="modal-close" id="uploadModalClose" aria-label="Close">&times;</button>
+    <div class="modal-title">Upload product</div>
+    <div class="modal-subtitle">Add a new item to the store. It'll appear immediately for customers.</div>
+
+    <div class="field-group">
+      <label>Product image</label>
+      <div class="image-drop" id="imageDropZone">
+        <input type="file" id="productImageInput" accept="image/*">
+        <span class="image-drop-label" id="imageDropLabel">Tap to choose a photo</span>
+      </div>
+      <div class="image-preview" id="imagePreview"><img id="imagePreviewImg" src="" alt=""></div>
+    </div>
+
+    <div class="field-group">
+      <label for="productNameInput">Product name</label>
+      <input type="text" id="productNameInput" placeholder="e.g. iPhone 17 Pro — 256GB">
+    </div>
+
+    <div class="field-group">
+      <label for="productCategorySelect">Category</label>
+      <select id="productCategorySelect">
+        <option value="Phones">Phones</option>
+        <option value="Laptops">Laptops</option>
+        <option value="Tablets">Tablets</option>
+        <option value="Accessories">Accessories</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label for="productPriceInput">Price (optional)</label>
+      <input type="text" id="productPriceInput" placeholder="e.g. ₦850,000">
+    </div>
+
+    <div class="field-group">
+      <label for="productDescInput">Description</label>
+      <textarea id="productDescInput" placeholder="Storage, color, condition, warranty info..."></textarea>
+    </div>
+
+    <div class="modal-error" id="uploadFormError">Please add a product name and image before uploading.</div>
+    <button class="modal-submit-btn" id="submitProductBtn">Upload Product →</button>
+  </div>
+</div>
+
+<!-- PRODUCT VIEW MODAL -->
+<div class="modal-overlay" id="productViewOverlay">
+  <div class="modal-card" id="productViewCard">
+    <button class="modal-close" id="productViewClose" aria-label="Close">&times;</button>
+    <div class="product-view-img"><img id="viewImg" src="" alt=""></div>
+    <span class="product-view-cat" id="viewCat"></span>
+    <div class="product-view-name" id="viewName"></div>
+    <div class="product-view-price" id="viewPrice"></div>
+    <div class="product-view-desc" id="viewDesc"></div>
+    <a href="#" target="_blank" rel="noopener" class="product-view-enquiry" id="viewEnquiry">Make Enquiry Today →</a>
+    <button class="product-view-delete" id="viewDeleteBtn" style="display:none;">Delete this product</button>
+  </div>
+</div>
+
+<script>
+  // mobile nav toggle
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.querySelector('.nav-links');
+  navToggle.addEventListener('click', () => {
+    const open = navLinks.style.display === 'flex';
+    navLinks.style.display = open ? 'none' : 'flex';
+    navLinks.style.cssText += open ? '' : 'position:fixed;top:70px;left:0;right:0;background:#FFFFFF;flex-direction:column;padding:24px 28px;border-bottom:1px solid rgba(18,17,15,0.08);gap:18px;box-shadow:0 16px 30px -18px rgba(18,17,15,0.2);';
+  });
+
+  // ===== Store data (browser localStorage) =====
+  const STORAGE_KEY = 'sakatan_store_products';
+  const ACCESS_CODE = 'sakatanventures';
+  const PAGE_SIZE = 30;
+  const CATEGORIES = ['All', 'Phones', 'Laptops', 'Tablets', 'Accessories'];
+
+  let activeCategory = 'All';
+  let searchTerm = '';
+  let currentPage = 1;
+
+  function loadProducts(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveProducts(products){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+      return true;
+    }catch(e){
+      alert('Could not save the product — your browser storage may be full (this often happens with large images). Try a smaller photo.');
+      return false;
+    }
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  // ===== Category filter chips =====
+  function renderCategoryChips(){
+    const wrap = document.getElementById('categoryFilters');
+    wrap.innerHTML = '';
+    CATEGORIES.forEach(cat => {
+      const chip = document.createElement('button');
+      chip.className = 'category-chip' + (cat === activeCategory ? ' active' : '');
+      chip.textContent = cat;
+      chip.addEventListener('click', () => {
+        activeCategory = cat;
+        currentPage = 1;
+        renderCategoryChips();
+        renderStore();
+      });
+      wrap.appendChild(chip);
+    });
+  }
+
+  // ===== Filtering + pagination + render =====
+  function getFilteredProducts(){
+    const all = loadProducts().slice().reverse(); // newest first
+    return all.filter(p => {
+      const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
+      const matchesSearch = !searchTerm || p.name.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }
+
+  function renderStore(){
+    const filtered = getFilteredProducts();
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+    const grid = document.getElementById('storeGrid');
+    grid.innerHTML = '';
+
+    if (pageItems.length === 0){
+      grid.innerHTML = '<div class="store-empty">No products found. Try a different search or category.</div>';
+    } else {
+      pageItems.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'store-card glass-panel reveal in';
+        card.innerHTML = `
+          <div class="store-card-img"><img src="${product.image}" alt="${escapeHtml(product.name)}"></div>
+          <div class="store-card-body">
+            <span class="store-card-cat">${escapeHtml(product.category)}</span>
+            <span class="store-card-name">${escapeHtml(product.name)}</span>
+            ${product.price ? `<span class="store-card-price">${escapeHtml(product.price)}</span>` : ''}
+          </div>
+        `;
+        card.addEventListener('click', () => openProductView(product));
+        grid.appendChild(card);
+      });
+    }
+
+    document.getElementById('storeCount').textContent =
+      filtered.length > 0 ? `${filtered.length} product${filtered.length === 1 ? '' : 's'} found` : '';
+
+    renderPagination(totalPages);
+  }
+
+  function renderPagination(totalPages){
+    const wrap = document.getElementById('pagination');
+    wrap.innerHTML = '';
+    if (totalPages <= 1) return;
+
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'page-btn';
+    prevBtn.textContent = '← Previous';
+    prevBtn.disabled = currentPage <= 1;
+    prevBtn.addEventListener('click', () => { currentPage--; renderStore(); window.scrollTo({top: document.querySelector('.store-section').offsetTop - 100, behavior:'smooth'}); });
+
+    const indicator = document.createElement('span');
+    indicator.className = 'page-indicator';
+    indicator.textContent = `Page ${currentPage} of ${totalPages}`;
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'page-btn';
+    nextBtn.textContent = 'Next →';
+    nextBtn.disabled = currentPage >= totalPages;
+    nextBtn.addEventListener('click', () => { currentPage++; renderStore(); window.scrollTo({top: document.querySelector('.store-section').offsetTop - 100, behavior:'smooth'}); });
+
+    wrap.appendChild(prevBtn);
+    wrap.appendChild(indicator);
+    wrap.appendChild(nextBtn);
+  }
+
+  document.getElementById('storeSearchInput').addEventListener('input', (e) => {
+    searchTerm = e.target.value;
+    currentPage = 1;
+    renderStore();
+  });
+
+  // ===== Modal helpers =====
+  function openModal(overlay){ document.body.classList.add('modal-open'); overlay.classList.add('open'); }
+  function closeModal(overlay){ overlay.classList.remove('open'); document.body.classList.remove('modal-open'); }
+
+  // ===== Password gate (hidden footer trigger) =====
+  const passwordOverlay = document.getElementById('passwordModalOverlay');
+  const accessCodeInput = document.getElementById('accessCodeInput');
+  const passwordError = document.getElementById('passwordError');
+
+  document.getElementById('openUploadPasswordBtn').addEventListener('click', () => {
+    accessCodeInput.value = '';
+    passwordError.style.display = 'none';
+    openModal(passwordOverlay);
+    setTimeout(() => accessCodeInput.focus(), 200);
+  });
+  document.getElementById('passwordModalClose').addEventListener('click', () => closeModal(passwordOverlay));
+  passwordOverlay.addEventListener('click', (e) => { if (e.target === passwordOverlay) closeModal(passwordOverlay); });
+
+  function tryUnlock(){
+    const val = accessCodeInput.value.trim().toLowerCase();
+    if (val === ACCESS_CODE){
+      sessionStorage.setItem('sakatan_admin_unlocked', 'true');
+      closeModal(passwordOverlay);
+      resetUploadForm();
+      openModal(uploadOverlay);
+    } else {
+      passwordError.style.display = 'block';
+    }
+  }
+  document.getElementById('submitPasswordBtn').addEventListener('click', tryUnlock);
+  accessCodeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryUnlock(); });
+
+  // ===== Upload product form =====
+  const uploadOverlay = document.getElementById('uploadModalOverlay');
+  const productImageInput = document.getElementById('productImageInput');
+  const imagePreview = document.getElementById('imagePreview');
+  const imagePreviewImg = document.getElementById('imagePreviewImg');
+  const imageDropLabel = document.getElementById('imageDropLabel');
+  const productNameInput = document.getElementById('productNameInput');
+  const productCategorySelect = document.getElementById('productCategorySelect');
+  const productPriceInput = document.getElementById('productPriceInput');
+  const productDescInput = document.getElementById('productDescInput');
+  const uploadFormError = document.getElementById('uploadFormError');
+
+  let currentImageDataUrl = '';
+
+  function resetUploadForm(){
+    productNameInput.value = '';
+    productPriceInput.value = '';
+    productDescInput.value = '';
+    productCategorySelect.value = 'Phones';
+    productImageInput.value = '';
+    currentImageDataUrl = '';
+    imagePreview.style.display = 'none';
+    imageDropLabel.textContent = 'Tap to choose a photo';
+    uploadFormError.style.display = 'none';
+  }
+
+  productImageInput.addEventListener('change', () => {
+    const file = productImageInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      currentImageDataUrl = e.target.result;
+      imagePreviewImg.src = currentImageDataUrl;
+      imagePreview.style.display = 'block';
+      imageDropLabel.textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('uploadModalClose').addEventListener('click', () => closeModal(uploadOverlay));
+  uploadOverlay.addEventListener('click', (e) => { if (e.target === uploadOverlay) closeModal(uploadOverlay); });
+
+  document.getElementById('submitProductBtn').addEventListener('click', () => {
+    const name = productNameInput.value.trim();
+    if (!name || !currentImageDataUrl){
+      uploadFormError.style.display = 'block';
+      return;
+    }
+    uploadFormError.style.display = 'none';
+
+    const products = loadProducts();
+    products.push({
+      id: Date.now(),
+      name,
+      category: productCategorySelect.value,
+      price: productPriceInput.value.trim(),
+      description: productDescInput.value.trim(),
+      image: currentImageDataUrl,
+      date: new Date().toISOString()
+    });
+    const ok = saveProducts(products);
+    if (ok){
+      closeModal(uploadOverlay);
+      currentPage = 1;
+      renderStore();
+    }
+  });
+
+  // ===== Product view modal =====
+  const productViewOverlay = document.getElementById('productViewOverlay');
+  const viewImg = document.getElementById('viewImg');
+  const viewCat = document.getElementById('viewCat');
+  const viewName = document.getElementById('viewName');
+  const viewPrice = document.getElementById('viewPrice');
+  const viewDesc = document.getElementById('viewDesc');
+  const viewEnquiry = document.getElementById('viewEnquiry');
+  const viewDeleteBtn = document.getElementById('viewDeleteBtn');
+  let currentViewProductId = null;
+
+  function openProductView(product){
+    currentViewProductId = product.id;
+    viewImg.src = product.image;
+    viewImg.alt = product.name;
+    viewCat.textContent = product.category;
+    viewName.textContent = product.name;
+    viewPrice.textContent = product.price || '';
+    viewPrice.style.display = product.price ? 'block' : 'none';
+    viewDesc.textContent = product.description || '';
+    viewDesc.style.display = product.description ? 'block' : 'none';
+
+    const waText = `Hello Sakatan, I want to make an enquiry about: ${product.name} (${product.category})${product.price ? ' — ' + product.price : ''}`;
+    viewEnquiry.href = `https://wa.me/2347025510862?text=${encodeURIComponent(waText)}`;
+
+    const unlocked = sessionStorage.getItem('sakatan_admin_unlocked') === 'true';
+    viewDeleteBtn.style.display = unlocked ? 'block' : 'none';
+
+    openModal(productViewOverlay);
+  }
+  document.getElementById('productViewClose').addEventListener('click', () => closeModal(productViewOverlay));
+  productViewOverlay.addEventListener('click', (e) => { if (e.target === productViewOverlay) closeModal(productViewOverlay); });
+
+  viewDeleteBtn.addEventListener('click', () => {
+    if (!confirm('Delete this product from the store?')) return;
+    const remaining = loadProducts().filter(p => String(p.id) !== String(currentViewProductId));
+    saveProducts(remaining);
+    closeModal(productViewOverlay);
+    renderStore();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (uploadOverlay.classList.contains('open')) closeModal(uploadOverlay);
+    else if (passwordOverlay.classList.contains('open')) closeModal(passwordOverlay);
+    else if (productViewOverlay.classList.contains('open')) closeModal(productViewOverlay);
+  });
+
+  // initial render
+  renderCategoryChips();
+  renderStore();
+</script>
+
+</body>
+</html>
