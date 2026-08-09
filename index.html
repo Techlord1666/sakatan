@@ -8,11 +8,28 @@
 <meta name="description" content="Sakatan Business Ventures — Computer Village Lagos's trusted dealer for original iPhones, Samsung phones, laptops and accessories. IMEI verified, warranty backed.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <style>
   .logo-img{height:38px;width:auto;display:block;object-fit:contain;}
   .footer-brand .logo-img{height:44px;}
+
+  /* ===== Premium typography ===== */
+  h1, h2, h3,
+  .logo span,
+  .rank b,
+  .product-modal-name,
+  .welcome-inner h2 {
+    font-family:'Fraunces', 'Space Grotesk', serif;
+    letter-spacing:-0.01em;
+  }
+  h1{ font-weight:600; }
+  h2{ font-weight:600; }
+  h3{ font-weight:600; font-family:'Space Grotesk', sans-serif; }
+  body, p, span, a, li, input, textarea, select, button{
+    font-family:'Inter', -apple-system, sans-serif;
+  }
+  .eyebrow{ font-family:'JetBrains Mono','Space Grotesk',monospace; }
 
   /* Clickable gallery thumb */
   .gallery-thumb{ cursor:pointer; }
@@ -286,6 +303,185 @@
     .cv-stats{ grid-template-columns:1fr 1fr; }
     .cv-stats b{ font-size:14px; }
   }
+
+  /* ===== Full-cover hero ===== */
+  .hero-cover{
+    position:relative;
+    min-height:100vh;
+    min-height:100svh;
+    display:flex;
+    align-items:flex-end;
+    overflow:hidden;
+    padding:0;
+    isolation:isolate;
+  }
+  .hero-bg{
+    position:absolute;
+    inset:0;
+    z-index:0;
+  }
+  .hero-bg img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center 28%;
+    display:block;
+  }
+  .hero-overlay{
+    position:absolute;
+    inset:0;
+    z-index:1;
+    background:
+      linear-gradient(180deg, rgba(10,9,8,0.35) 0%, rgba(10,9,8,0.15) 30%, rgba(10,9,8,0.55) 70%, rgba(10,9,8,0.94) 100%),
+      linear-gradient(90deg, rgba(10,9,8,0.55) 0%, rgba(10,9,8,0.05) 55%);
+  }
+  .hero-cover-inner{
+    position:relative;
+    z-index:2;
+    width:100%;
+    padding:140px 0 56px;
+    box-sizing:border-box;
+  }
+  .hero-cover-inner .eyebrow{
+    display:inline-block;
+    color:#FFB088;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.18);
+    padding:6px 14px;
+    border-radius:999px;
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+  }
+  .hero-cover-inner h1{
+    color:#fff;
+    font-size:clamp(2.4rem, 7vw, 4.4rem);
+    line-height:1.05;
+    margin:18px 0 16px;
+    max-width:14ch;
+  }
+  .hero-cover-inner h1 .accent{ color:#FF8A50; }
+  .hero-cover-inner .lead{
+    color:rgba(255,255,255,0.86);
+    max-width:46ch;
+    font-size:clamp(1rem, 2.2vw, 1.15rem);
+    line-height:1.6;
+  }
+  .hero-cover-inner .hero-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin:28px 0 36px;
+  }
+  .hero-cover-inner .btn-ghost{
+    color:#fff;
+    border-color:rgba(255,255,255,0.4);
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+  }
+  .hero-cover-inner .btn-ghost:hover{
+    border-color:rgba(255,255,255,0.7);
+    background:rgba(255,255,255,0.12);
+  }
+  .hero-cover-inner .hero-trust{
+    display:grid;
+    grid-template-columns:repeat(4,auto);
+    gap:28px;
+    padding-top:24px;
+    border-top:1px solid rgba(255,255,255,0.16);
+    max-width:640px;
+  }
+  .hero-cover-inner .hero-trust .stat b{
+    color:#fff;
+    display:block;
+    font-size:1.15rem;
+    font-family:'Space Grotesk', sans-serif;
+  }
+  .hero-cover-inner .hero-trust .stat span{
+    color:rgba(255,255,255,0.6);
+    font-size:11px;
+    font-family:var(--mono, monospace);
+    letter-spacing:.02em;
+  }
+
+  @media (max-width:820px){
+    .hero-cover-inner .hero-trust{ grid-template-columns:repeat(2,1fr); gap:18px 24px; }
+  }
+  @media (max-width:600px){
+    .hero-cover{ min-height:92vh; min-height:92svh; align-items:flex-end; }
+    .hero-bg img{ object-position:62% center; }
+    .hero-cover-inner{ padding:120px 0 40px; }
+    .hero-cover-inner h1{ max-width:100%; font-size:clamp(2.1rem, 9vw, 2.8rem); }
+    .hero-cover-inner .lead{ max-width:100%; }
+    .hero-cover-inner .hero-actions{ flex-direction:column; gap:12px; }
+    .hero-cover-inner .hero-actions .btn{ width:100%; text-align:center; }
+    .hero-cover-inner .hero-trust{ max-width:100%; }
+  }
+
+  /* ===== Welcome section ===== */
+  .welcome-section{ position:relative; padding:64px 0; }
+  .welcome-inner{
+    padding:48px 40px;
+    text-align:center;
+    max-width:920px;
+    margin:0 auto;
+    background:linear-gradient(160deg, rgba(255,122,61,0.07), rgba(46,204,113,0.04) 70%);
+  }
+  .welcome-badge{
+    display:inline-block;
+    font-family:var(--mono, monospace);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#FF8A50;
+    background:rgba(255,122,61,0.1);
+    border:1px solid rgba(255,122,61,0.25);
+    padding:6px 14px;
+    border-radius:999px;
+    margin-bottom:18px;
+  }
+  .welcome-inner h2{
+    font-size:clamp(1.7rem, 4vw, 2.4rem);
+    margin-bottom:14px;
+    line-height:1.2;
+  }
+  .welcome-inner p{
+    max-width:60ch;
+    margin:0 auto;
+    color:var(--gray);
+    font-size:15.5px;
+    line-height:1.7;
+  }
+  .welcome-points{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+    margin-top:36px;
+  }
+  .welcome-points > div{
+    padding:20px 14px;
+    border-radius:14px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .welcome-points b{
+    display:block;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:16px;
+    margin-bottom:6px;
+    color:#FF8A50;
+  }
+  .welcome-points span{
+    font-size:12.5px;
+    color:var(--gray);
+    line-height:1.5;
+    display:block;
+  }
+  @media (max-width:640px){
+    .welcome-inner{ padding:34px 20px; }
+    .welcome-points{ grid-template-columns:1fr; gap:10px; margin-top:26px; }
+    .welcome-points > div{ padding:16px; }
+  }
 </style>
 </head>
 <body>
@@ -315,42 +511,41 @@
 
 <main id="top">
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <span class="eyebrow">Computer Village, Ikeja — Lagos State</span>
-        <h1>Original phones,<br>zero <span class="accent">wahala.</span></h1>
-        <p class="lead">Sakatan Business Ventures sells genuine iPhones, Samsung devices, laptops and accessories — every unit IMEI-checked and warranty-backed before it leaves our shop.</p>
-        <div class="hero-actions">
-          <a href="https://wa.me/2347025510862?text=Hello%20Sakatan%2C%20I%20want%20to%20check%20out%20your%20phones" class="btn btn-primary" target="_blank" rel="noopener">Order on WhatsApp →</a>
-          <a href="#why-cv" class="btn btn-ghost">Why we're No 1 in Ikeja</a>
-        </div>
-        <div class="hero-trust">
-          <div class="stat"><b>100%</b><span>IMEI Verified</span></div>
-          <div class="stat"><b>6 Months</b><span>Warranty Cover</span></div>
-          <div class="stat"><b>10+ Yrs</b><span>In Computer Village</span></div>
-          <div class="stat"><b>20k+</b><span>Devices Sold</span></div>
-        </div>
+  <!-- HERO — full-cover -->
+  <section class="hero hero-cover">
+    <div class="hero-bg">
+      <img src="hero-phone.png" alt="Latest Samsung flagship phone and laptop displayed by Sakatan Business Ventures" loading="eager">
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="wrap hero-cover-inner">
+      <span class="eyebrow">Computer Village, Ikeja — Lagos State</span>
+      <h1>Original phones,<br>zero <span class="accent">wahala.</span></h1>
+      <p class="lead">Sakatan Business Ventures sells genuine iPhones, Samsung devices, laptops and accessories — every unit IMEI-checked and warranty-backed before it leaves our shop.</p>
+      <div class="hero-actions">
+        <a href="https://wa.me/2347025510862?text=Hello%20Sakatan%2C%20I%20want%20to%20check%20out%20your%20phones" class="btn btn-primary" target="_blank" rel="noopener">Order on WhatsApp →</a>
+        <a href="#why-cv" class="btn btn-ghost">Why we're No 1 in Ikeja</a>
       </div>
+      <div class="hero-trust">
+        <div class="stat"><b>100%</b><span>IMEI Verified</span></div>
+        <div class="stat"><b>6 Months</b><span>Warranty Cover</span></div>
+        <div class="stat"><b>10+ Yrs</b><span>In Computer Village</span></div>
+        <div class="stat"><b>20k+</b><span>Devices Sold</span></div>
+      </div>
+    </div>
+  </section>
 
-      <div class="hero-visual">
-        <div class="device-frame reveal">
-          <img src="hero-phone.png" alt="Latest Samsung flagship phone and laptop displayed by Sakatan Business Ventures" loading="eager">
-          <div class="scan-line"></div>
-          <span class="corner tl"></span><span class="corner tr"></span>
-          <span class="corner bl"></span><span class="corner br"></span>
+  <!-- WELCOME -->
+  <section class="welcome-section reveal" id="welcome">
+    <div class="wrap">
+      <div class="welcome-inner glass-panel">
+        <span class="welcome-badge">Welcome</span>
+        <h2>Welcome to Sakatan Business Ventures</h2>
+        <p>For over a decade, we've been a trusted name inside Computer Village — Lagos's biggest tech market. Every iPhone, Samsung device and laptop that leaves our shop is IMEI-checked, hardware-verified and backed by real after-sales support. Come as a first-time buyer or a returning customer — you'll be treated the same way: honestly.</p>
+        <div class="welcome-points">
+          <div><b>Genuine, always</b><span>No fairly-used passed off as new, no clones — ever.</span></div>
+          <div><b>10+ years trusted</b><span>Same shops, same numbers, still here for you.</span></div>
+          <div><b>Delivered nationwide</b><span>Lagos same-week, anywhere in Nigeria on request.</span></div>
         </div>
-        <div class="verify-badge">
-          <span class="dot">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#2ECC71" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
-          </span>
-          <div>
-            <b>Genuine Device</b>
-            <span>IMEI VERIFIED · Ikeja-LAGOS</span>
-          </div>
-        </div>
-        <div class="price-badge">SWAP AVAILABLE</div>
       </div>
     </div>
   </section>
@@ -497,7 +692,7 @@
       </div>
 
       <div class="gallery-cta reveal">
-        <a href="https://wa.me/2347025510862?text=Hello%20Sakatan%2C%20I%20saw%20your%20gallery%20and%20I%20want%20to%20get%20one" class="btn btn-primary" target="_blank" rel="noopener">Get Yours Today →</a>
+        <a href="store.html" class="btn btn-primary">Check Store →</a>
       </div>
 
       <!-- PRODUCT DETAIL POPUP -->
