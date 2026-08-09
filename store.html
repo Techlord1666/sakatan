@@ -4,8 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/jpeg" href="logo.jpeg">
-<title>Store | Sakatan Business Ventures — Computer Village, Lagos State</title>
-<meta name="description" content="Browse original iPhones, Samsung phones, laptops and accessories from Sakatan Business Ventures — Computer Village, Ikeja, Lagos State.">
+<title>Store | Sakatan Business Ventures — Original iPhones, Samsung & Laptops in Computer Village, Lagos</title>
+<meta name="description" content="Shop original iPhones, Samsung Galaxy phones, laptops and accessories from Sakatan Business Ventures — Computer Village, Ikeja, Lagos State. IMEI verified, warranty backed, nationwide delivery.">
+<meta name="keywords" content="Sakatan Business Ventures, Computer Village Lagos, original iPhone Lagos, Samsung Galaxy Ikeja, buy laptop Lagos, phone dealer Computer Village, IMEI verified phones Nigeria, iPhone Pro Lagos, MacBook Lagos, gaming laptop Nigeria, phone accessories Ikeja, genuine phones Nigeria">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://sakatanventures.com/store.html">
+
+<!-- Open Graph / social sharing (Facebook, WhatsApp, Instagram, LinkedIn) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sakatan Business Ventures">
+<meta property="og:title" content="Sakatan Business Ventures — Original Phones, Laptops & Accessories">
+<meta property="og:description" content="Browse our full store of original iPhones, Samsung phones, laptops and accessories — IMEI verified and warranty backed. Computer Village, Ikeja, Lagos State.">
+<meta property="og:image" content="https://sakatanventures.com/logo.jpeg">
+<meta property="og:url" content="https://sakatanventures.com/store.html">
+
+<!-- Twitter / X card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sakatan Business Ventures — Original Phones, Laptops & Accessories">
+<meta name="twitter:description" content="Browse our full store of original iPhones, Samsung phones, laptops and accessories — IMEI verified and warranty backed. Computer Village, Ikeja, Lagos State.">
+<meta name="twitter:image" content="https://sakatanventures.com/logo.jpeg">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -418,12 +436,18 @@
     <div class="product-view-name" id="viewName"></div>
     <div class="product-view-price" id="viewPrice"></div>
     <div class="product-view-desc" id="viewDesc"></div>
-    <a href="#" target="_blank" rel="noopener" class="product-view-enquiry" id="viewEnquiry">Make Enquiry Today →</a>
+    <a href="#" target="_blank" rel="noopener" class="product-view-enquiry" id="viewEnquiry">Contact Us →</a>
     <button class="product-view-delete" id="viewDeleteBtn" style="display:none;">Delete this product</button>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // ===== Supabase setup =====
+  const SUPABASE_URL = 'https://syljifskxodcqamcxqew.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_drOpLMxD3-m7OTbGJSH3qQ_ioSCA77T';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   // mobile nav toggle
   const navToggle = document.getElementById('navToggle');
   const navLinks = document.querySelector('.nav-links');
@@ -433,8 +457,7 @@
     navLinks.style.cssText += open ? '' : 'position:fixed;top:70px;left:0;right:0;background:#FFFFFF;flex-direction:column;padding:24px 28px;border-bottom:1px solid rgba(18,17,15,0.08);gap:18px;box-shadow:0 16px 30px -18px rgba(18,17,15,0.2);';
   });
 
-  // ===== Store data (browser localStorage) =====
-  const STORAGE_KEY = 'sakatan_store_products';
+  // ===== Store data (Supabase — visible to every visitor) =====
   const ACCESS_CODE = 'sakatanventures';
   const PAGE_SIZE = 30;
   const CATEGORIES = ['All', 'Phones', 'Laptops', 'Tablets', 'Accessories'];
@@ -442,21 +465,67 @@
   let activeCategory = 'All';
   let searchTerm = '';
   let currentPage = 1;
+  let allProducts = []; // cached from Supabase, refreshed after load/insert/delete
 
-  function loadProducts(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    }catch(e){ return []; }
-  }
-  function saveProducts(products){
-    try{
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-      return true;
-    }catch(e){
-      alert('Could not save the product — your browser storage may be full (this often happens with large images). Try a smaller photo.');
-      return false;
+  async function fetchProductsFromSupabase(){
+    const { data, error } = await supabaseClient
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error){
+      console.error('Error loading products:', error);
+      return [];
     }
+    // map DB column names (image_url) to what the UI expects (image)
+    return (data || []).map(p => ({
+      id: p.id,
+      name: p.name,
+      category: p.category,
+      price: p.price,
+      description: p.description,
+      image: p.image_url,
+      date: p.created_at
+    }));
+  }
+
+  async function uploadImageToSupabase(file){
+    const ext = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error: uploadError } = await supabaseClient
+      .storage
+      .from('product-images')
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabaseClient
+      .storage
+      .from('product-images')
+      .getPublicUrl(fileName);
+
+    return data.publicUrl;
+  }
+
+  async function insertProductToSupabase(product, accessCode){
+    const { data, error } = await supabaseClient.rpc('insert_product', {
+      p_name: product.name,
+      p_category: product.category,
+      p_price: product.price,
+      p_description: product.description,
+      p_image_url: product.image,
+      p_access_code: accessCode
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  async function deleteProductFromSupabase(id, accessCode){
+    const { error } = await supabaseClient.rpc('delete_product', {
+      p_id: id,
+      p_access_code: accessCode
+    });
+    if (error) throw error;
   }
 
   function escapeHtml(str){
@@ -485,7 +554,7 @@
 
   // ===== Filtering + pagination + render =====
   function getFilteredProducts(){
-    const all = loadProducts().slice().reverse(); // newest first
+    const all = allProducts; // already newest-first from Supabase
     return all.filter(p => {
       const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
       const matchesSearch = !searchTerm || p.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -579,10 +648,14 @@
   document.getElementById('passwordModalClose').addEventListener('click', () => closeModal(passwordOverlay));
   passwordOverlay.addEventListener('click', (e) => { if (e.target === passwordOverlay) closeModal(passwordOverlay); });
 
+  let sessionAccessCode = sessionStorage.getItem('sakatan_admin_code') || '';
+
   function tryUnlock(){
     const val = accessCodeInput.value.trim().toLowerCase();
     if (val === ACCESS_CODE){
+      sessionAccessCode = val;
       sessionStorage.setItem('sakatan_admin_unlocked', 'true');
+      sessionStorage.setItem('sakatan_admin_code', val);
       closeModal(passwordOverlay);
       resetUploadForm();
       openModal(uploadOverlay);
@@ -606,6 +679,7 @@
   const uploadFormError = document.getElementById('uploadFormError');
 
   let currentImageDataUrl = '';
+  let currentImageFile = null;
 
   function resetUploadForm(){
     productNameInput.value = '';
@@ -614,6 +688,7 @@
     productCategorySelect.value = 'Phones';
     productImageInput.value = '';
     currentImageDataUrl = '';
+    currentImageFile = null;
     imagePreview.style.display = 'none';
     imageDropLabel.textContent = 'Tap to choose a photo';
     uploadFormError.style.display = 'none';
@@ -622,6 +697,7 @@
   productImageInput.addEventListener('change', () => {
     const file = productImageInput.files[0];
     if (!file) return;
+    currentImageFile = file;
     const reader = new FileReader();
     reader.onload = (e) => {
       currentImageDataUrl = e.target.result;
@@ -635,29 +711,39 @@
   document.getElementById('uploadModalClose').addEventListener('click', () => closeModal(uploadOverlay));
   uploadOverlay.addEventListener('click', (e) => { if (e.target === uploadOverlay) closeModal(uploadOverlay); });
 
-  document.getElementById('submitProductBtn').addEventListener('click', () => {
+  document.getElementById('submitProductBtn').addEventListener('click', async () => {
     const name = productNameInput.value.trim();
-    if (!name || !currentImageDataUrl){
+    if (!name || !currentImageFile){
+      uploadFormError.textContent = 'Please add a product name and image before uploading.';
       uploadFormError.style.display = 'block';
       return;
     }
     uploadFormError.style.display = 'none';
 
-    const products = loadProducts();
-    products.push({
-      id: Date.now(),
-      name,
-      category: productCategorySelect.value,
-      price: productPriceInput.value.trim(),
-      description: productDescInput.value.trim(),
-      image: currentImageDataUrl,
-      date: new Date().toISOString()
-    });
-    const ok = saveProducts(products);
-    if (ok){
+    const submitBtn = document.getElementById('submitProductBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Uploading...';
+
+    try{
+      const imageUrl = await uploadImageToSupabase(currentImageFile);
+      await insertProductToSupabase({
+        name,
+        category: productCategorySelect.value,
+        price: productPriceInput.value.trim(),
+        description: productDescInput.value.trim(),
+        image: imageUrl
+      }, sessionAccessCode);
+
       closeModal(uploadOverlay);
       currentPage = 1;
-      renderStore();
+      await refreshStore();
+    }catch(err){
+      console.error(err);
+      uploadFormError.textContent = 'Could not upload the product. Please try again.';
+      uploadFormError.style.display = 'block';
+    }finally{
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Upload Product →';
     }
   });
 
@@ -672,7 +758,7 @@
   const viewDeleteBtn = document.getElementById('viewDeleteBtn');
   let currentViewProductId = null;
 
-  function openProductView(product){
+  function openProductView(product, updateUrl = true){
     currentViewProductId = product.id;
     viewImg.src = product.image;
     viewImg.alt = product.name;
@@ -689,29 +775,75 @@
     const unlocked = sessionStorage.getItem('sakatan_admin_unlocked') === 'true';
     viewDeleteBtn.style.display = unlocked ? 'block' : 'none';
 
+    if (updateUrl){
+      const url = new URL(window.location);
+      url.searchParams.set('product', product.id);
+      history.pushState({ productId: product.id }, '', url);
+    }
+
     openModal(productViewOverlay);
   }
-  document.getElementById('productViewClose').addEventListener('click', () => closeModal(productViewOverlay));
-  productViewOverlay.addEventListener('click', (e) => { if (e.target === productViewOverlay) closeModal(productViewOverlay); });
 
-  viewDeleteBtn.addEventListener('click', () => {
+  function clearProductParam(){
+    const url = new URL(window.location);
+    if (url.searchParams.has('product')){
+      url.searchParams.delete('product');
+      history.pushState({}, '', url);
+    }
+  }
+
+  document.getElementById('productViewClose').addEventListener('click', () => { closeModal(productViewOverlay); clearProductParam(); });
+  productViewOverlay.addEventListener('click', (e) => { if (e.target === productViewOverlay){ closeModal(productViewOverlay); clearProductParam(); } });
+
+  viewDeleteBtn.addEventListener('click', async () => {
     if (!confirm('Delete this product from the store?')) return;
-    const remaining = loadProducts().filter(p => String(p.id) !== String(currentViewProductId));
-    saveProducts(remaining);
-    closeModal(productViewOverlay);
-    renderStore();
+    try{
+      await deleteProductFromSupabase(currentViewProductId, sessionAccessCode);
+      closeModal(productViewOverlay);
+      clearProductParam();
+      await refreshStore();
+    }catch(err){
+      console.error(err);
+      alert('Could not delete this product. Please try unlocking again.');
+    }
+  });
+
+  window.addEventListener('popstate', () => {
+    const params = new URLSearchParams(window.location.search);
+    const pid = params.get('product');
+    if (!pid){
+      closeModal(productViewOverlay);
+      return;
+    }
+    const found = allProducts.find(p => String(p.id) === String(pid));
+    if (found) openProductView(found, false);
   });
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (uploadOverlay.classList.contains('open')) closeModal(uploadOverlay);
     else if (passwordOverlay.classList.contains('open')) closeModal(passwordOverlay);
-    else if (productViewOverlay.classList.contains('open')) closeModal(productViewOverlay);
+    else if (productViewOverlay.classList.contains('open')){ closeModal(productViewOverlay); clearProductParam(); }
   });
 
-  // initial render
-  renderCategoryChips();
-  renderStore();
+  // ===== Initial load =====
+  async function refreshStore(){
+    allProducts = await fetchProductsFromSupabase();
+    renderStore();
+  }
+
+  (async function init(){
+    renderCategoryChips();
+    await refreshStore();
+
+    // If the link that brought someone here points at a specific product, open it
+    const params = new URLSearchParams(window.location.search);
+    const pid = params.get('product');
+    if (pid){
+      const found = allProducts.find(p => String(p.id) === String(pid));
+      if (found) openProductView(found, false);
+    }
+  })();
 </script>
 
 </body>
