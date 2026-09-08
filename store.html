@@ -232,8 +232,15 @@
     transition:transform .2s ease, box-shadow .2s ease;
   }
   .product-view-enquiry:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(255,90,31,0.45); }
+  .product-view-actions{ display:flex; gap:10px; margin-top:10px; }
+  .product-view-edit{
+    flex:1; text-align:center; font-family:var(--mono, monospace); font-size:11.5px; font-weight:600;
+    color:rgba(255,255,255,0.75); background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:10px;
+    padding:9px; cursor:pointer; transition:color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .product-view-edit:hover{ color:#FF8A50; border-color:rgba(255,122,61,0.5); background:rgba(255,122,61,0.1); }
   .product-view-delete{
-    margin-top:10px; width:100%; text-align:center; font-family:var(--mono, monospace); font-size:11.5px;
+    flex:1; text-align:center; font-family:var(--mono, monospace); font-size:11.5px;
     color:rgba(255,255,255,0.4); background:none; border:1px solid rgba(255,255,255,0.15); border-radius:10px;
     padding:9px; cursor:pointer; transition:color .2s ease, border-color .2s ease;
   }
@@ -381,12 +388,12 @@
   </div>
 </div>
 
-<!-- UPLOAD PRODUCT MODAL -->
+<!-- UPLOAD / EDIT PRODUCT MODAL -->
 <div class="modal-overlay" id="uploadModalOverlay">
   <div class="modal-card" id="uploadModalCard">
     <button class="modal-close" id="uploadModalClose" aria-label="Close">&times;</button>
-    <div class="modal-title">Upload product</div>
-    <div class="modal-subtitle">Add a new item to the store. It'll appear immediately for customers.</div>
+    <div class="modal-title" id="uploadModalTitle">Upload product</div>
+    <div class="modal-subtitle" id="uploadModalSubtitle">Add a new item to the store. It'll appear immediately for customers.</div>
 
     <div class="field-group">
       <label>Product image</label>
@@ -437,7 +444,10 @@
     <div class="product-view-price" id="viewPrice"></div>
     <div class="product-view-desc" id="viewDesc"></div>
     <a href="#" target="_blank" rel="noopener" class="product-view-enquiry" id="viewEnquiry">Contact Us →</a>
-    <button class="product-view-delete" id="viewDeleteBtn" style="display:none;">Delete this product</button>
+    <div class="product-view-actions" id="viewAdminActions" style="display:none;">
+      <button class="product-view-edit" id="viewEditBtn">Edit product</button>
+      <button class="product-view-delete" id="viewDeleteBtn">Delete product</button>
+    </div>
   </div>
 </div>
 
@@ -465,7 +475,7 @@
   let activeCategory = 'All';
   let searchTerm = '';
   let currentPage = 1;
-  let allProducts = []; // cached from Supabase, refreshed after load/insert/delete
+  let allProducts = []; // cached from Supabase, refreshed after load/insert/delete/update
 
   async function fetchProductsFromSupabase(){
     const { data, error } = await supabaseClient
@@ -509,6 +519,20 @@
 
   async function insertProductToSupabase(product, accessCode){
     const { data, error } = await supabaseClient.rpc('insert_product', {
+      p_name: product.name,
+      p_category: product.category,
+      p_price: product.price,
+      p_description: product.description,
+      p_image_url: product.image,
+      p_access_code: accessCode
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  async function updateProductInSupabase(id, product, accessCode){
+    const { data, error } = await supabaseClient.rpc('update_product', {
+      p_id: id,
       p_name: product.name,
       p_category: product.category,
       p_price: product.price,
@@ -666,8 +690,10 @@
   document.getElementById('submitPasswordBtn').addEventListener('click', tryUnlock);
   accessCodeInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryUnlock(); });
 
-  // ===== Upload product form =====
+  // ===== Upload / Edit product form =====
   const uploadOverlay = document.getElementById('uploadModalOverlay');
+  const uploadModalTitle = document.getElementById('uploadModalTitle');
+  const uploadModalSubtitle = document.getElementById('uploadModalSubtitle');
   const productImageInput = document.getElementById('productImageInput');
   const imagePreview = document.getElementById('imagePreview');
   const imagePreviewImg = document.getElementById('imagePreviewImg');
@@ -677,11 +703,16 @@
   const productPriceInput = document.getElementById('productPriceInput');
   const productDescInput = document.getElementById('productDescInput');
   const uploadFormError = document.getElementById('uploadFormError');
+  const submitProductBtn = document.getElementById('submitProductBtn');
 
   let currentImageDataUrl = '';
   let currentImageFile = null;
+  let editingProductId = null;   // null = creating a new product, otherwise = id being edited
+  let editingExistingImageUrl = ''; // keeps the current image if the admin doesn't choose a new one
 
   function resetUploadForm(){
+    editingProductId = null;
+    editingExistingImageUrl = '';
     productNameInput.value = '';
     productPriceInput.value = '';
     productDescInput.value = '';
@@ -692,6 +723,34 @@
     imagePreview.style.display = 'none';
     imageDropLabel.textContent = 'Tap to choose a photo';
     uploadFormError.style.display = 'none';
+    uploadModalTitle.textContent = 'Upload product';
+    uploadModalSubtitle.textContent = "Add a new item to the store. It'll appear immediately for customers.";
+    submitProductBtn.textContent = 'Upload Product →';
+  }
+
+  function openEditForm(product){
+    editingProductId = product.id;
+    editingExistingImageUrl = product.image || '';
+    productNameInput.value = product.name || '';
+    productPriceInput.value = product.price || '';
+    productDescInput.value = product.description || '';
+    productCategorySelect.value = product.category || 'Phones';
+    productImageInput.value = '';
+    currentImageFile = null;
+    currentImageDataUrl = '';
+    if (editingExistingImageUrl){
+      imagePreviewImg.src = editingExistingImageUrl;
+      imagePreview.style.display = 'block';
+      imageDropLabel.textContent = 'Tap to replace the photo';
+    } else {
+      imagePreview.style.display = 'none';
+      imageDropLabel.textContent = 'Tap to choose a photo';
+    }
+    uploadFormError.style.display = 'none';
+    uploadModalTitle.textContent = 'Edit product';
+    uploadModalSubtitle.textContent = 'Update the details below. Leave the photo as is to keep the current image.';
+    submitProductBtn.textContent = 'Save Changes →';
+    openModal(uploadOverlay);
   }
 
   productImageInput.addEventListener('change', () => {
@@ -711,39 +770,48 @@
   document.getElementById('uploadModalClose').addEventListener('click', () => closeModal(uploadOverlay));
   uploadOverlay.addEventListener('click', (e) => { if (e.target === uploadOverlay) closeModal(uploadOverlay); });
 
-  document.getElementById('submitProductBtn').addEventListener('click', async () => {
+  submitProductBtn.addEventListener('click', async () => {
     const name = productNameInput.value.trim();
-    if (!name || !currentImageFile){
-      uploadFormError.textContent = 'Please add a product name and image before uploading.';
+    const hasImage = !!currentImageFile || (editingProductId && editingExistingImageUrl);
+    if (!name || !hasImage){
+      uploadFormError.textContent = 'Please add a product name and image before saving.';
       uploadFormError.style.display = 'block';
       return;
     }
     uploadFormError.style.display = 'none';
 
-    const submitBtn = document.getElementById('submitProductBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Uploading...';
+    submitProductBtn.disabled = true;
+    submitProductBtn.textContent = editingProductId ? 'Saving...' : 'Uploading...';
 
     try{
-      const imageUrl = await uploadImageToSupabase(currentImageFile);
-      await insertProductToSupabase({
+      const imageUrl = currentImageFile
+        ? await uploadImageToSupabase(currentImageFile)
+        : editingExistingImageUrl;
+
+      const productPayload = {
         name,
         category: productCategorySelect.value,
         price: productPriceInput.value.trim(),
         description: productDescInput.value.trim(),
         image: imageUrl
-      }, sessionAccessCode);
+      };
+
+      if (editingProductId){
+        await updateProductInSupabase(editingProductId, productPayload, sessionAccessCode);
+      } else {
+        await insertProductToSupabase(productPayload, sessionAccessCode);
+      }
 
       closeModal(uploadOverlay);
-      currentPage = 1;
+      if (!editingProductId) currentPage = 1;
       await refreshStore();
     }catch(err){
       console.error(err);
-      uploadFormError.textContent = 'Could not upload the product. Please try again.';
+      uploadFormError.textContent = 'Could not save the product. Please try again.';
       uploadFormError.style.display = 'block';
     }finally{
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Upload Product →';
+      submitProductBtn.disabled = false;
+      submitProductBtn.textContent = editingProductId ? 'Save Changes →' : 'Upload Product →';
     }
   });
 
@@ -755,11 +823,13 @@
   const viewPrice = document.getElementById('viewPrice');
   const viewDesc = document.getElementById('viewDesc');
   const viewEnquiry = document.getElementById('viewEnquiry');
+  const viewAdminActions = document.getElementById('viewAdminActions');
+  const viewEditBtn = document.getElementById('viewEditBtn');
   const viewDeleteBtn = document.getElementById('viewDeleteBtn');
-  let currentViewProductId = null;
+  let currentViewProduct = null;
 
   function openProductView(product, updateUrl = true){
-    currentViewProductId = product.id;
+    currentViewProduct = product;
     viewImg.src = product.image;
     viewImg.alt = product.name;
     viewCat.textContent = product.category;
@@ -773,7 +843,7 @@
     viewEnquiry.href = `https://wa.me/2347025510862?text=${encodeURIComponent(waText)}`;
 
     const unlocked = sessionStorage.getItem('sakatan_admin_unlocked') === 'true';
-    viewDeleteBtn.style.display = unlocked ? 'block' : 'none';
+    viewAdminActions.style.display = unlocked ? 'flex' : 'none';
 
     if (updateUrl){
       const url = new URL(window.location);
@@ -795,10 +865,17 @@
   document.getElementById('productViewClose').addEventListener('click', () => { closeModal(productViewOverlay); clearProductParam(); });
   productViewOverlay.addEventListener('click', (e) => { if (e.target === productViewOverlay){ closeModal(productViewOverlay); clearProductParam(); } });
 
+  viewEditBtn.addEventListener('click', () => {
+    if (!currentViewProduct) return;
+    closeModal(productViewOverlay);
+    openEditForm(currentViewProduct);
+  });
+
   viewDeleteBtn.addEventListener('click', async () => {
+    if (!currentViewProduct) return;
     if (!confirm('Delete this product from the store?')) return;
     try{
-      await deleteProductFromSupabase(currentViewProductId, sessionAccessCode);
+      await deleteProductFromSupabase(currentViewProduct.id, sessionAccessCode);
       closeModal(productViewOverlay);
       clearProductParam();
       await refreshStore();
