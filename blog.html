@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   .logo-img{height:38px;width:auto;display:block;object-fit:contain;}
   .footer-brand .logo-img{height:44px;}
@@ -350,6 +351,10 @@
 </div>
 
 <script>
+  const SUPABASE_URL = 'https://syljifskxodcqamcxqew.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_drOpLMxD3-m7OTbGJSH3qQ_ioSCA77T';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   // mobile nav toggle
   const navToggle = document.getElementById('navToggle');
   const navLinks = document.querySelector('.nav-links');
@@ -359,24 +364,65 @@
     navLinks.style.cssText += open ? '' : 'position:fixed;top:70px;left:0;right:0;background:#FFFFFF;flex-direction:column;padding:24px 28px;border-bottom:1px solid rgba(18,17,15,0.08);gap:18px;box-shadow:0 16px 30px -18px rgba(18,17,15,0.2);';
   });
 
-  // ===== Blog storage (browser localStorage) =====
-  const STORAGE_KEY = 'sakatan_blog_posts';
+  // ===== Blog storage (Supabase — visible to every visitor) =====
   const ACCESS_CODE = 'sakatanventures';
+  let sessionAccessCode = sessionStorage.getItem('sakatan_admin_code') || '';
+  let allPosts = []; // cached from Supabase, refreshed after load/insert/delete
 
-  function loadPosts(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    }catch(e){ return []; }
-  }
-  function savePosts(posts){
-    try{
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-      return true;
-    }catch(e){
-      alert('Could not save the post — your browser storage may be full (this often happens with large images). Try a smaller photo.');
-      return false;
+  async function fetchPostsFromSupabase(){
+    const { data, error } = await supabaseClient
+      .from('blog_posts')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error){
+      console.error('Error loading posts:', error);
+      return [];
     }
+    return (data || []).map(p => ({
+      id: p.id,
+      title: p.title,
+      content: p.content,
+      image: p.image,
+      date: p.created_at
+    }));
+  }
+
+  async function uploadImageToSupabase(file){
+    const ext = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error: uploadError } = await supabaseClient
+      .storage
+      .from('blog-images')
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabaseClient
+      .storage
+      .from('blog-images')
+      .getPublicUrl(fileName);
+
+    return data.publicUrl;
+  }
+
+  async function insertPostToSupabase(post, accessCode){
+    const { data, error } = await supabaseClient.rpc('insert_post', {
+      p_title: post.title,
+      p_content: post.content,
+      p_image: post.image,
+      p_access_code: accessCode
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  async function deletePostFromSupabase(id, accessCode){
+    const { error } = await supabaseClient.rpc('delete_post', {
+      p_id: id,
+      p_access_code: accessCode
+    });
+    if (error) throw error;
   }
 
   function formatDate(iso){
@@ -385,18 +431,17 @@
   }
 
   function renderPosts(){
-    const posts = loadPosts();
     const grid = document.getElementById('blogGrid');
     grid.innerHTML = '';
 
-    if (posts.length === 0){
+    if (allPosts.length === 0){
       grid.innerHTML = '<div class="blog-empty">No posts yet — check back soon, or click "Post Blog" below to add the first one.</div>';
       return;
     }
 
     const unlocked = sessionStorage.getItem('sakatan_admin_unlocked') === 'true';
 
-    posts.slice().reverse().forEach(post => {
+    allPosts.forEach(post => {
       const card = document.createElement('article');
       card.className = 'blog-card reveal in';
       card.innerHTML = `
@@ -413,15 +458,23 @@
 
     if (unlocked){
       grid.querySelectorAll('.blog-delete-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           if (!confirm('Delete this post?')) return;
-          const id = btn.dataset.id;
-          const remaining = loadPosts().filter(p => String(p.id) !== String(id));
-          savePosts(remaining);
-          renderPosts();
+          try{
+            await deletePostFromSupabase(btn.dataset.id, sessionAccessCode);
+            await refreshPosts();
+          }catch(err){
+            console.error(err);
+            alert('Could not delete this post. Please try unlocking again.');
+          }
         });
       });
     }
+  }
+
+  async function refreshPosts(){
+    allPosts = await fetchPostsFromSupabase();
+    renderPosts();
   }
 
   function escapeHtml(str){
@@ -457,7 +510,9 @@
   function tryUnlock(){
     const val = accessCodeInput.value.trim().toLowerCase();
     if (val === ACCESS_CODE){
+      sessionAccessCode = val;
       sessionStorage.setItem('sakatan_admin_unlocked', 'true');
+      sessionStorage.setItem('sakatan_admin_code', val);
       closeModal(passwordOverlay);
       resetPostForm();
       openModal(postFormOverlay);
@@ -479,12 +534,14 @@
   const postContentInput = document.getElementById('postContentInput');
   const postFormError = document.getElementById('postFormError');
 
+  let currentImageFile = null;
   let currentImageDataUrl = '';
 
   function resetPostForm(){
     postTopicInput.value = '';
     postContentInput.value = '';
     postImageInput.value = '';
+    currentImageFile = null;
     currentImageDataUrl = '';
     imagePreview.style.display = 'none';
     imageDropLabel.textContent = 'Tap to choose a photo';
@@ -494,6 +551,7 @@
   postImageInput.addEventListener('change', () => {
     const file = postImageInput.files[0];
     if (!file) return;
+    currentImageFile = file;
     const reader = new FileReader();
     reader.onload = (e) => {
       currentImageDataUrl = e.target.result;
@@ -507,27 +565,38 @@
   document.getElementById('postFormModalClose').addEventListener('click', () => closeModal(postFormOverlay));
   postFormOverlay.addEventListener('click', (e) => { if (e.target === postFormOverlay) closeModal(postFormOverlay); });
 
-  document.getElementById('submitPostBtn').addEventListener('click', () => {
+  document.getElementById('submitPostBtn').addEventListener('click', async () => {
     const title = postTopicInput.value.trim();
     const content = postContentInput.value.trim();
     if (!title || !content){
+      postFormError.textContent = 'Please add a topic and some writing before posting.';
       postFormError.style.display = 'block';
       return;
     }
     postFormError.style.display = 'none';
 
-    const posts = loadPosts();
-    posts.push({
-      id: Date.now(),
-      title,
-      content,
-      image: currentImageDataUrl,
-      date: new Date().toISOString()
-    });
-    const ok = savePosts(posts);
-    if (ok){
+    const submitBtn = document.getElementById('submitPostBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Publishing...';
+
+    try{
+      const imageUrl = currentImageFile ? await uploadImageToSupabase(currentImageFile) : null;
+
+      await insertPostToSupabase({
+        title,
+        content,
+        image: imageUrl
+      }, sessionAccessCode);
+
       closeModal(postFormOverlay);
-      renderPosts();
+      await refreshPosts();
+    }catch(err){
+      console.error(err);
+      postFormError.textContent = 'Could not publish the post. Please try unlocking again.';
+      postFormError.style.display = 'block';
+    }finally{
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Publish Post →';
     }
   });
 
@@ -537,8 +606,8 @@
     else if (passwordOverlay.classList.contains('open')) closeModal(passwordOverlay);
   });
 
-  // initial render
-  renderPosts();
+  // initial load
+  refreshPosts();
 </script>
 
 </body>
